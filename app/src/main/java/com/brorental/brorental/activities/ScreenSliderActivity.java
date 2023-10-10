@@ -11,6 +11,7 @@ import com.brorental.brorental.databinding.ActivityScreenSliderBinding;
 public class ScreenSliderActivity extends AppCompatActivity {
 
     private String TAG = "SliderActivity.java";
+
     private ActivityScreenSliderBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
