@@ -24,7 +24,7 @@ public class SliderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(getActivity().getLayoutInflater(), R.layout.fragment_slider, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_slider, container, false);
         if(getArguments() != null) {
             binding.img.setImageResource((int) getArguments().getLong("image"));
             binding.title.setText(getArguments().getString("title"));
