@@ -18,5 +18,6 @@ public class SharedPref {
     public void setFirstTime(boolean isFirstTime) {
         SharedPreferences.Editor edit = sharedPreferences.edit();
         edit.putBoolean("isFirstTime", isFirstTime);
+        edit.apply();
     }
 }
