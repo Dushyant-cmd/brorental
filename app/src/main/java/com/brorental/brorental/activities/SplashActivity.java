@@ -1,17 +1,17 @@
 package com.brorental.brorental.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
 import com.brorental.brorental.AppClass;
-import com.brorental.brorental.LoginActivity;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
+import com.brorental.brorental.SignUpAndLogin;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
@@ -28,10 +28,17 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 Log.d(TAG, "run: " + appClass.sharedPref.isFirstTime());
                 if(!appClass.sharedPref.isFirstTime()) {
-                    Intent i = new Intent(SplashActivity.this, LoginActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
-                    finish();
+                    if(!appClass.sharedPref.isLogin()) {
+                        Intent i = new Intent(SplashActivity.this, SignUpAndLogin.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    } else {
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    }
                 } else {
                     appClass.sharedPref.setFirstTime(false);
                     Intent i = new Intent(SplashActivity.this, ScreenSliderActivity.class);

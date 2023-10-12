@@ -1,0 +1,356 @@
+package com.brorental.brorental.activities;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
+import com.brorental.brorental.MainActivity;
+import com.brorental.brorental.R;
+import com.brorental.brorental.databinding.ActivityOtpBinding;
+import com.brorental.brorental.localdb.SharedPref;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+public class OtpActivity extends AppCompatActivity {
+
+    //Firebase Authentication product or library java class in android
+    private FirebaseAuth mAuth;
+
+    //verificationId store verificationId returns from firebase auth when otp sent successfully
+    private String mVerificationId;
+
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+    String phone;
+    String TAG = "OtpActivity.java", referCode;
+    ProgressDialog dialog;
+    Thread t;
+    FirebaseFirestore mFirestore;
+    SharedPref sharedPreferences;
+    private ActivityOtpBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_otp);
+
+        mAuth = FirebaseAuth.getInstance();
+        Intent i = getIntent();
+        phone = "+91 " + i.getStringExtra("phone");
+        referCode = i.getStringExtra("referCode");
+        binding.phone2.setText(phone);
+        binding.phone2.setVisibility(View.VISIBLE);
+        binding.login.setEnabled(false);
+        sharedPreferences = new SharedPref(OtpActivity.this);
+        dialog = new ProgressDialog(OtpActivity.this);
+        mFirestore = FirebaseFirestore.getInstance();
+
+        //set the TextWatcher interface instance on otp pinView
+        binding.otp.addTextChangedListener(mTextWatcher);
+        //Send otp code of user number comes from previous activity by Intent
+        if (isNetworkConnected()) {
+            sendOtp(phone);
+            resendCountFunction();
+        } else {
+            openAlertDialog1();
+        }
+
+        //set OnClickListener and verify otp when user click on login button
+        //if the automatic sms detection did not work, user can also enter the code manually
+        //so adding a click listener to the button
+        binding.login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String code = Objects.requireNonNull(binding.otp.getText()).toString().trim();
+                if (code.isEmpty() || code.length() < 6) {
+                    binding.otp.setError("Enter valid code");
+                    binding.otp.requestFocus();
+                    return;
+                }
+                dialog.setMessage("Please wait...");
+                //verifying the code entered manually
+                verifyVerificationCode(code);
+            }
+        });
+
+        binding.resendOtp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.resendOTPTV.setVisibility(View.GONE);
+                binding.resendOtp.setVisibility(View.GONE);
+                resendCountFunction();
+                Toast.makeText(OtpActivity.this, "Resending OTP", Toast.LENGTH_SHORT).show();
+                sendOtp(phone);
+            }
+        });
+    }
+
+
+    //TextWatcher interface instance using Anonymous class and Override and implement onTextChanged() method which is called by android every
+    //time the otp pinView text input comes from user so we simply check condition if user filled full otp if yes then enable login button
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            //Do some work before text changed
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            //Doing some work when text is changing
+            if (binding.otp.getText().toString().length() == 6) {
+                binding.login.setEnabled(true);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            //Do some work after text changed
+        }
+    };
+
+    //resendCount() method is start a timer and when the timer is up do certain operation
+    private void resendCountFunction() {
+        binding.otpTimer.setVisibility(View.VISIBLE);
+        t = new Thread() {
+            public void run() {
+                for (int i = 0; i < 30; i++) {
+                    try {
+                        final int a = i;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                if (a == 29) {
+                                    binding.otpTimer.setVisibility(View.GONE);
+                                    binding.resendOtp.setVisibility(View.VISIBLE);
+                                    binding.resendOTPTV.setVisibility(View.VISIBLE);
+                                    t.interrupt();
+                                }
+                                binding.otpTimer.setText("Resend Code in " + (30 - (a + 1)));
+                            }
+                        });
+                        //   System.out.println("Value of i= " + i);
+                        sleep(1000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t.start();
+
+    }
+
+    private void sendOtp(String phone) {
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone)       // Phone number to verify
+                .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                .setActivity(this)                 // Activity (for callback binding)
+                .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
+                .build();
+        PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+        //onVerificationCompleted method called by android when the verification of otp is verified inside this method we get sms and auto
+        //verify the user by calling
+        @Override
+        public void onVerificationCompleted(PhoneAuthCredential credential) {
+            Log.d(TAG, "onVerificationCompleted:" + credential);
+
+            //Getting the code sent by SMS
+            String code = credential.getSmsCode();
+            Log.v("OtpActivity.java", code + "");
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            if (code != null) {
+                dialog.setMessage("Wait while generating account");
+                dialog.show();
+                binding.otp.setText(code);
+//              verifying the code
+                verifyVerificationCode(code);
+            } else {
+                binding.login.setEnabled(true);
+            }
+        }
+
+        //when verification of user otp is failed or send otp is failed
+        @Override
+        public void onVerificationFailed(FirebaseException e) {
+            // This callback is invoked in an invalid request for verification is made,
+            // for instance if the the phone number format is not valid.
+            Log.w(TAG, "onVerificationFailed", e);
+            if (dialog.isShowing()) dialog.dismiss();
+
+            if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                // Invalid request
+                Toast.makeText(OtpActivity.this, "Invalid request", Toast.LENGTH_SHORT).show();
+            } else if (e instanceof FirebaseTooManyRequestsException) {
+                // The SMS quota for the project has been exceeded
+                Toast.makeText(OtpActivity.this, "Otp limits exceeded", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        //when firebase successfully sent otp to user phone number and return verification id of otp and token
+        @Override
+        public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken token) {
+            // The SMS verification code has been sent to the provided phone number, we
+            // now need to ask the user to enter the code and then construct a credential
+            // by combining the code with a verification ID.
+            Log.d(TAG, "onCodeSent:" + verificationId);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            Toast.makeText(OtpActivity.this, "Otp sent on " + phone + " successfully", Toast.LENGTH_SHORT).show();
+            // Save verification ID and resending token so we can use them later
+            mVerificationId = verificationId;
+            mResendToken = token;
+        }
+    };
+
+    //This method is create PhoneAuthCredential class object by pass verification id and otp then call signInWithPhoneAuthCredential() method
+    //and pass credential(PhoneAuthCredential class object) in order to sign-in user
+    private void verifyVerificationCode(String code) {
+        //Get credential of user enter otp like code and verificationId
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
+
+        //sign in user with phone auth credential on firebase using below method
+        signInWithPhoneAuthCredential(credential);
+    }
+
+    //this method called signInWithCredential() method with credential input param in it on FirebaseAuth class instance.
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithCredential:success");
+
+//                            FirebaseUser user = task.getResult().getUser();
+//                            assert user != null;
+////                            Log.v(TAG, user.getPhoneNumber() + "");
+                    if (isNetworkConnected()) {
+                        isUserExist(phone);
+                    } else {
+                        openAlertDialog();
+                    }
+                } else {
+                    // Sign in failed, display a message and update the UI
+                    Log.w(TAG, "signInWithCredential:failure", task.getException());
+                    if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                        // The verification code entered was invalid
+                        Toast.makeText(OtpActivity.this, "OTP is invalid", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+    }
+
+    private void openAlertDialog1() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(OtpActivity.this);
+        builder.setMessage("Check network connection!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (isNetworkConnected()) {
+                    Toast.makeText(getApplicationContext(), "Network connected successfully", Toast.LENGTH_SHORT).show();
+                    sendOtp(phone);
+                    resendCountFunction();
+                } else {
+                    openAlertDialog1();
+                }
+            }
+        });
+        builder.create().show();//create() method returns AlertDialog class object which is subclass of Dialog class and show() to display
+        //AlertDialog
+    }
+
+    private void openAlertDialog() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(OtpActivity.this);
+        builder.setMessage("Check network connection!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (isNetworkConnected()) {
+                    isUserExist(phone);
+                    Toast.makeText(getApplicationContext(), "Network connected successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    openAlertDialog();
+                }
+            }
+        });
+        builder.create().show();//create() method returns AlertDialog class object which is subclass of Dialog class and show() to display
+        //AlertDialog
+    }
+
+    private void isUserExist(String phone) {
+        dialog.show();
+        mFirestore.collection("users").whereEqualTo("mobile", phone).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                    //login
+                    Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(OtpActivity.this, MainActivity.class);
+                    i.putExtra("phone", phone);//with +91 code in phone variable.
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+                    finish();
+                    sharedPreferences.setLogin(true);
+                    dialog.dismiss();
+                } else if (task.isSuccessful()) {
+                    try {
+                        //sign-up
+                        Intent i = new Intent(OtpActivity.this, MainActivity.class);
+                        i.putExtra("phone", phone);//with +91 code in phone variable.
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss();
+                        sharedPreferences.setLogin(true);
+                        Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.v("OtpActivity.java", e + "");
+                    }
+                } else {
+                }
+            }
+        });
+    }
+
+    //check mobile device is connected to network or not.
+    private boolean isNetworkConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        boolean connected = (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED);
+        return connected;
+    }
+}

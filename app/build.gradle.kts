@@ -51,5 +51,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
-
+    //pinview
+    implementation ("io.github.chaosleung:pinview:1.4.4")
 }

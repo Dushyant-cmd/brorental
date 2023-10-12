@@ -20,4 +20,14 @@ public class SharedPref {
         edit.putBoolean("isFirstTime", isFirstTime);
         edit.apply();
     }
+
+    public boolean isLogin() {
+        return sharedPreferences.getBoolean("isLogin", false);
+    }
+
+    public void setLogin(boolean isLogin) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLogin", isLogin);
+        editor.apply();
+    }
 }

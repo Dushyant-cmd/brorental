@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil;
 import com.brorental.brorental.AppClass;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
+import com.brorental.brorental.SignUpAndLogin;
 import com.brorental.brorental.adapters.SliderAdapter;
 import com.brorental.brorental.databinding.ActivityScreenSliderBinding;
 
@@ -54,7 +55,7 @@ public class ScreenSliderActivity extends AppCompatActivity {
                 binding.viewPager.setCurrentItem(binding.viewPager.getCurrentItem() + 1, true);
             else {
                 application.sharedPref.setFirstTime(false);
-                Intent i = new Intent(ScreenSliderActivity.this, MainActivity.class);
+                Intent i = new Intent(ScreenSliderActivity.this, SignUpAndLogin.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
