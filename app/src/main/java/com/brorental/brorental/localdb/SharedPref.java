@@ -3,6 +3,8 @@ package com.brorental.brorental.localdb;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.brorental.brorental.models.User;
+
 public class SharedPref {
     private SharedPreferences sharedPreferences;
     private String TAG = "SharedPreferences.java";
@@ -28,6 +30,22 @@ public class SharedPref {
     public void setLogin(boolean isLogin) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isLogin", isLogin);
+        editor.apply();
+    }
+
+    public User getUser() {
+        return new User(sharedPreferences.getString("name", ""), sharedPreferences.getString("mobile", "")
+        , sharedPreferences.getString("pin", ""), sharedPreferences.getString("totalRent", ""),
+                sharedPreferences.getString("totalRide", ""), sharedPreferences.getBoolean("termsCheck", false));
+    }
+    public void saveUser(User user) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("name", user.getName());
+        editor.putString("mobile", user.getMobile());
+        editor.putString("totalRent", user.getTotalRent());
+        editor.putString("totalRide", user.getTotalRide());
+        editor.putString("pin", user.getPin());
+        editor.putBoolean("termsCheck", user.isTermsCheck());
         editor.apply();
     }
 }

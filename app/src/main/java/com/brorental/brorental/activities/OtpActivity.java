@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,10 @@ import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityOtpBinding;
 import com.brorental.brorental.localdb.SharedPref;
+import com.brorental.brorental.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
@@ -31,9 +35,12 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -107,6 +114,13 @@ public class OtpActivity extends AppCompatActivity {
                 sendOtp(phone);
             }
         });
+
+        ArrayList<String> list = new ArrayList<>();
+        list.add("Select a Language");
+        list.add("English");
+        list.add("Hindi");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, list);
+        binding.langSpinner.setAdapter(adapter);
     }
 
 
@@ -317,26 +331,83 @@ public class OtpActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                    //login
-                    Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(OtpActivity.this, MainActivity.class);
-                    i.putExtra("phone", phone);//with +91 code in phone variable.
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(i);
-                    finish();
-                    sharedPreferences.setLogin(true);
-                    dialog.dismiss();
-                } else if (task.isSuccessful()) {
-                    try {
-                        //sign-up
+                    DocumentSnapshot d = task.getResult().getDocuments().get(0);
+                    if(d.getBoolean("termsCheck")) {
+                        //login
+                        Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
                         Intent i = new Intent(OtpActivity.this, MainActivity.class);
                         i.putExtra("phone", phone);//with +91 code in phone variable.
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         finish();
-                        dialog.dismiss();
                         sharedPreferences.setLogin(true);
-                        Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();
+                        sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"), d.getString("totalRent"),
+                                d.getString("totalRide"), d.getBoolean("termsCheck")));
+                        dialog.dismiss();
+                    } else {
+                        binding.otpLl.setVisibility(View.GONE);
+                        binding.termsLangLL.setVisibility(View.VISIBLE);
+                    }
+                } else if (task.isSuccessful()) {
+                    try {
+                        //sign-up
+                        mFirestore.collection("ids").document("pins")
+                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            String pin = task.getResult().getString("broRentalPin");
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            map.put("broRentalPin", Long.parseLong(pin) + 1);
+                                            mFirestore.collection("ids").document("pins")
+                                                    .update(map)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            String username = "Guest_" + pin;
+                                                            HashMap<String, Object> map2 = new HashMap<>();
+                                                            map2.put("name", username);
+                                                            map2.put("mobile", phone);
+                                                            map2.put("pin", pin);
+                                                            map2.put("totalRentItem", "0");
+                                                            map2.put("totalRides", "0");
+                                                            map2.put("termsCheck", false);
+
+                                                            mFirestore.collection("users")
+                                                                    .document(pin).set(map2).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
+                                                                            Intent i = new Intent(OtpActivity.this, MainActivity.class);
+                                                                            i.putExtra("phone", phone);//with +91 code in phone variable.
+                                                                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            startActivity(i);
+                                                                            finish();
+                                                                            dialog.dismiss();
+                                                                            sharedPreferences.setLogin(true);
+                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false));
+                                                                            binding.otpLl.setVisibility(View.GONE);
+                                                                            binding.otpLl.setVisibility(View.VISIBLE);
+                                                                            Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.d(TAG, "onFailure: " + t);
+                                                                        }
+                                                                    });
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d(TAG, "onFailure: " + t);
+                                                        }
+                                                    });
+                                        } else {
+                                            Toast.makeText(OtpActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            Log.d(TAG, "onComplete: " + task.getException());
+                                        }
+                                    }
+                                });
                     } catch (Exception e) {
                         Log.v("OtpActivity.java", e + "");
                     }
