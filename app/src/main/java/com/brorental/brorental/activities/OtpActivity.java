@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
+import com.brorental.brorental.adapters.LanguageSpinnerAdapter;
 import com.brorental.brorental.databinding.ActivityOtpBinding;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.User;
@@ -119,13 +119,32 @@ public class OtpActivity extends AppCompatActivity {
         list.add("Select a Language");
         list.add("English");
         list.add("Hindi");
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, list);
+        LanguageSpinnerAdapter adapter = new LanguageSpinnerAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
         binding.langSpinner.setAdapter(adapter);
+        
+        binding.submitBtn.setOnClickListener(view -> {
+            if(binding.termsCb.isChecked()) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("termsCheck", true);
+                mFirestore.collection("users")
+                        .document(sharedPreferences.getUser().getPin())
+                        .update(map)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()) {
+                                    Log.d(TAG, "onComplete: " + task.getResult());
+                                } else {
+                                    Log.d(TAG, "onComplete: " + task.getException());
+                                }
+                            }
+                        });
+            } else {
+                Toast.makeText(this, "Please check Terms & Conditions", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-
-    //TextWatcher interface instance using Anonymous class and Override and implement onTextChanged() method which is called by android every
-    //time the otp pinView text input comes from user so we simply check condition if user filled full otp if yes then enable login button
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -345,6 +364,7 @@ public class OtpActivity extends AppCompatActivity {
                                 d.getString("totalRide"), d.getBoolean("termsCheck")));
                         dialog.dismiss();
                     } else {
+                        dialog.dismiss();
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -358,7 +378,7 @@ public class OtpActivity extends AppCompatActivity {
                                         if(task.isSuccessful()) {
                                             String pin = task.getResult().getString("broRentalPin");
                                             HashMap<String, Object> map = new HashMap<>();
-                                            map.put("broRentalPin", Long.parseLong(pin) + 1);
+                                            map.put("broRentalPin", "" + Long.parseLong(pin) + 1);
                                             mFirestore.collection("ids").document("pins")
                                                     .update(map)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {

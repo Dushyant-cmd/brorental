@@ -11,7 +11,6 @@ import androidx.databinding.DataBindingUtil;
 import com.brorental.brorental.AppClass;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
-import com.brorental.brorental.SignUpAndLogin;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {

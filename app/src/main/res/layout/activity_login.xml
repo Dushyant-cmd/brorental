@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:paddingHorizontal="20dp"
-        tools:context=".SignUpAndLogin">
+        tools:context=".activities.SignUpAndLogin">
 
 
         <ImageView
@@ -58,15 +58,17 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/nextBtn"
                 android:focusableInTouchMode="false"
+                android:autoText="false"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="16dp">
 
                 <EditText
+                    android:autoText="false"
                     android:focusableInTouchMode="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+91"
-                    android:inputType="phone" />
+                    android:inputType="textFilter" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

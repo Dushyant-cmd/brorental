@@ -23,7 +23,7 @@
             android:name=".activities.OtpActivity"
             android:exported="false" />
         <activity
-            android:name=".SignUpAndLogin"
+            android:name=".activities.SignUpAndLogin"
             android:exported="false" />
         <activity
             android:name=".activities.ScreenSliderActivity"

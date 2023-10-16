@@ -1,4 +1,4 @@
-package com.brorental.brorental;
+package com.brorental.brorental.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.brorental.brorental.activities.OtpActivity;
+import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityLoginBinding;
 
 public class SignUpAndLogin extends AppCompatActivity {

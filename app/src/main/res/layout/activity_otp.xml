@@ -8,22 +8,19 @@
     </data>
 
     <LinearLayout
-        android:id="@+id/otp_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/white_rect"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="16dp"
         android:visibility="visible"
         tools:context=".activities.OtpActivity">
 
         <LinearLayout
+            android:id="@+id/otp_ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/white_rect"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
@@ -131,7 +128,7 @@
         <LinearLayout
             android:id="@+id/terms_lang_LL"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/white_rect"
             android:gravity="center"
             android:orientation="vertical"
