@@ -23,6 +23,7 @@ import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityOtpBinding;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.User;
+import com.brorental.brorental.utilities.DialogCustoms;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -123,7 +124,7 @@ public class OtpActivity extends AppCompatActivity {
         binding.langSpinner.setAdapter(adapter);
         
         binding.submitBtn.setOnClickListener(view -> {
-            if(binding.termsCb.isChecked()) {
+            if(binding.termsCb.isChecked() && !binding.langSpinner.getSelectedItem().toString().contains("Select")) {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("termsCheck", true);
                 mFirestore.collection("users")
@@ -140,7 +141,7 @@ public class OtpActivity extends AppCompatActivity {
                             }
                         });
             } else {
-                Toast.makeText(this, "Please check Terms & Conditions", Toast.LENGTH_SHORT).show();
+                DialogCustoms.showSnackBar(this, "Please select Terms & Condition's and language", binding.getRoot());
             }
         });
     }
