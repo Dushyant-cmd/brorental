@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,6 @@ import androidx.databinding.DataBindingUtil;
 
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
-import com.brorental.brorental.adapters.LanguageSpinnerAdapter;
 import com.brorental.brorental.databinding.ActivityOtpBinding;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.User;
@@ -119,7 +119,7 @@ public class OtpActivity extends AppCompatActivity {
         list.add("Select a Language");
         list.add("English");
         list.add("Hindi");
-        LanguageSpinnerAdapter adapter = new LanguageSpinnerAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
+        ArrayAdapter adapter = new ArrayAdapter<>(OtpActivity.this, android.R.layout.simple_spinner_dropdown_item, list);
         binding.langSpinner.setAdapter(adapter);
         
         binding.submitBtn.setOnClickListener(view -> {
