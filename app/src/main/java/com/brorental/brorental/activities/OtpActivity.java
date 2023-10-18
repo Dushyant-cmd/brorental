@@ -198,7 +198,8 @@ public class OtpActivity extends AppCompatActivity {
     }
 
     private void sendOtp(String phone) {
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone)       // Phone number to verify
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(phone)       // Phone number to verify
                 .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
                 .setActivity(this)                 // Activity (for callback binding)
                 .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
@@ -213,7 +214,6 @@ public class OtpActivity extends AppCompatActivity {
         @Override
         public void onVerificationCompleted(PhoneAuthCredential credential) {
             Log.d(TAG, "onVerificationCompleted:" + credential);
-
             //Getting the code sent by SMS
             String code = credential.getSmsCode();
             Log.v("OtpActivity.java", code + "");
@@ -239,7 +239,6 @@ public class OtpActivity extends AppCompatActivity {
             // for instance if the the phone number format is not valid.
             Log.w(TAG, "onVerificationFailed", e);
             if (dialog.isShowing()) dialog.dismiss();
-
             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
                 Toast.makeText(OtpActivity.this, "Invalid request", Toast.LENGTH_SHORT).show();
