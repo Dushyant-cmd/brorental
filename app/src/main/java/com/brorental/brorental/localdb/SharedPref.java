@@ -48,4 +48,8 @@ public class SharedPref {
         editor.putBoolean("termsCheck", user.isTermsCheck());
         editor.apply();
     }
+
+    public void logout() {
+        sharedPreferences.edit().clear().apply();
+    }
 }

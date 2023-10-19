@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"/>
+    <item
+        android:id="@+id/rent"
+        android:title="Rent"/>
+    <item
+        android:id="@+id/driving"
+        android:title="Start Driving"/>
+    <item
+        android:id="@+id/history"
+        android:title="History"/>
+    <item
+        android:id="@+id/termsCon"
+        android:title="Terms &amp; Conditions"/>
+    <item
+        android:id="@+id/logout"
+        android:title="Log-out"/>
+</menu>

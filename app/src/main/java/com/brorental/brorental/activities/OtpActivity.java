@@ -52,7 +52,8 @@ public class OtpActivity extends AppCompatActivity {
 
     //verificationId store verificationId returns from firebase auth when otp sent successfully
     private String mVerificationId;
-
+    private String name, pin, totalRide, totalRent;
+    private boolean termsCheck;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
     String TAG = "OtpActivity.java", referCode;
@@ -61,6 +62,7 @@ public class OtpActivity extends AppCompatActivity {
     FirebaseFirestore mFirestore;
     SharedPref sharedPreferences;
     private ActivityOtpBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,26 +124,41 @@ public class OtpActivity extends AppCompatActivity {
         list.add("Hindi");
         ArrayAdapter adapter = new ArrayAdapter<>(OtpActivity.this, android.R.layout.simple_spinner_dropdown_item, list);
         binding.langSpinner.setAdapter(adapter);
-        
+
         binding.submitBtn.setOnClickListener(view -> {
-            if(binding.termsCb.isChecked() && !binding.langSpinner.getSelectedItem().toString().contains("Select")) {
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("termsCheck", true);
-                mFirestore.collection("users")
-                        .document(sharedPreferences.getUser().getPin())
-                        .update(map)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful()) {
-                                    Log.d(TAG, "onComplete: " + task.getResult());
-                                } else {
-                                    Log.d(TAG, "onComplete: " + task.getException());
+            try {
+                Log.d(TAG, "onCreate: " + sharedPreferences.getUser().getPin());
+                if (binding.termsCb.isChecked() && !binding.langSpinner.getSelectedItem().toString().contains("Select")) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("termsCheck", true);
+                    map.put("language", binding.langSpinner.getSelectedItem());
+                    mFirestore.collection("users")
+                            .document(pin)
+                            .update(map)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Intent i = new Intent(OtpActivity.this, MainActivity.class);
+                                        i.putExtra("phone", phone);//with +91 code in phone variable.
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                        finish();
+                                        sharedPreferences.setLogin(true);
+                                        sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
+                                                totalRide, true));
+                                        Log.d(TAG, "onComplete: " + task.getResult());
+                                    } else {
+                                        Log.d(TAG, "onComplete: " + task.getException());
+                                    }
                                 }
-                            }
-                        });
-            } else {
-                DialogCustoms.showSnackBar(this, "Please select Terms & Condition's and language", binding.getRoot());
+                            });
+                } else {
+                    DialogCustoms.showSnackBar(this, "Please select Terms & Condition's and language", binding.getRoot());
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "onCreate: " + e);
+                sharedPreferences.logout();
             }
         });
     }
@@ -349,9 +366,10 @@ public class OtpActivity extends AppCompatActivity {
         mFirestore.collection("users").whereEqualTo("mobile", phone).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                Log.d(TAG, "onComplete: " + task.getResult());
                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                     DocumentSnapshot d = task.getResult().getDocuments().get(0);
-                    if(d.getBoolean("termsCheck")) {
+                    if (d.getBoolean("termsCheck")) {
                         //login
                         Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
                         Intent i = new Intent(OtpActivity.this, MainActivity.class);
@@ -359,12 +377,19 @@ public class OtpActivity extends AppCompatActivity {
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         finish();
-                        sharedPreferences.setLogin(true);
-                        sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"), d.getString("totalRent"),
-                                d.getString("totalRide"), d.getBoolean("termsCheck")));
+                        name = d.getString("name");
+                        pin = d.getString("pin");
+                        totalRent = d.getString("totalRent");
+                        totalRide = d.getString("totalRide");
+                        termsCheck = d.getBoolean("termsCheck");
                         dialog.dismiss();
                     } else {
                         dialog.dismiss();
+                        name = d.getString("name");
+                        pin = d.getString("pin");
+                        totalRent = d.getString("totalRent");
+                        totalRide = d.getString("totalRide");
+                        termsCheck = d.getBoolean("termsCheck");
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -375,7 +400,7 @@ public class OtpActivity extends AppCompatActivity {
                                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if(task.isSuccessful()) {
+                                        if (task.isSuccessful()) {
                                             String pin = task.getResult().getString("broRentalPin");
                                             HashMap<String, Object> map = new HashMap<>();
                                             map.put("broRentalPin", "" + Long.parseLong(pin) + 1);
