@@ -1,8 +1,11 @@
 package com.brorental.brorental.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +16,8 @@ import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
 
+import java.util.Locale;
+
 public class SplashActivity extends AppCompatActivity {
     private String TAG = "SplashActivity.java";
     private ActivitySplashBinding binding;
@@ -22,6 +27,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(SplashActivity.this, R.layout.activity_splash);
         appClass = (AppClass) getApplication();
+        setLocale("en");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -47,5 +53,14 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         }, 2000);
+    }
+
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
     }
 }

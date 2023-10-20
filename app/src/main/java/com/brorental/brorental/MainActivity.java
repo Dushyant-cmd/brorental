@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private String TAG = "MainBinding.java";
