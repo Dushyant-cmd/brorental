@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction fT = fm.beginTransaction();
         fT.replace(R.id.fragmentContainer, searchFragment);
+        fT.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         fT.addToBackStack(null);
         fT.commit();
     }
