@@ -1,4 +1,4 @@
-package com.brorental.brorental;
+package com.brorental.brorental.utilities;
 
 import android.app.Application;
 

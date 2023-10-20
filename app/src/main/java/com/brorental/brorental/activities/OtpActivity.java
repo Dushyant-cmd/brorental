@@ -377,12 +377,10 @@ public class OtpActivity extends AppCompatActivity {
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         finish();
-                        name = d.getString("name");
-                        pin = d.getString("pin");
-                        totalRent = d.getString("totalRent");
-                        totalRide = d.getString("totalRide");
-                        termsCheck = d.getBoolean("termsCheck");
                         dialog.dismiss();
+                        sharedPreferences.setLogin(true);
+                        sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
+                                totalRide, true));
                     } else {
                         dialog.dismiss();
                         name = d.getString("name");

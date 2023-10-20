@@ -1,5 +1,6 @@
 package com.brorental.brorental.fragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,19 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.brorental.brorental.AppClass;
 import com.brorental.brorental.R;
 import com.brorental.brorental.adapters.HintAdapter;
 import com.brorental.brorental.databinding.FragmentSearchBinding;
+import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.Utility;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -42,11 +43,10 @@ public class SearchFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.recyclerView.setAdapter(adapter);
         mFirestore = ((AppClass) getActivity().getApplication()).firestore;
-
-        if(Utility.isNetworkAvailable(getActivity())) {
+        if (Utility.isNetworkAvailable(getActivity())) {
             getCategories();
         } else {
-            noNetworkSnackBar();
+            noNetworkDialog();
         }
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -56,10 +56,10 @@ public class SearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(cateArr != null && !newText.isEmpty()) {
+                if (cateArr != null && !newText.isEmpty()) {
                     hintList.clear();
-                    for(int i=0; i<cateArr.length; i++) {
-                        if(cateArr[i].contains(newText)) {
+                    for (int i = 0; i < cateArr.length; i++) {
+                        if (cateArr[i].contains(newText)) {
                             hintList.add(cateArr[i]);
                         }
                     }
@@ -74,19 +74,23 @@ public class SearchFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void noNetworkSnackBar() {
-        Snackbar snackbar = Snackbar.make(getActivity(), binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction("Connect", new View.OnClickListener() {
+    private void noNetworkDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage("No connection");
+        builder.setPositiveButton("connect", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(Utility.isNetworkAvailable(getActivity())) {
+            public void onClick(DialogInterface dialog, int which) {
+                if (Utility.isNetworkAvailable(getActivity())) {
                     getCategories();
+                    dialog.dismiss();
                 } else {
-                    noNetworkSnackBar();
+                    dialog.dismiss();
+                    noNetworkDialog();
                 }
             }
         });
-        snackbar.show();
+        builder.create().show();
     }
 
     private void getCategories() {
@@ -94,7 +98,7 @@ public class SearchFragment extends Fragment {
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful() && task.getResult().exists()) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
                             DocumentSnapshot d = task.getResult();
                             cateArr = d.getString("categories").split(",");
                         } else {
