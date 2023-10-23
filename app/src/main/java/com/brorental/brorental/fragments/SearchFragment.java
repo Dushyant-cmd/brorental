@@ -48,6 +48,8 @@ public class SearchFragment extends Fragment {
         } else {
             noNetworkDialog();
         }
+
+        binding.searchView.requestFocus();
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -59,7 +61,7 @@ public class SearchFragment extends Fragment {
                 if (cateArr != null && !newText.isEmpty()) {
                     hintList.clear();
                     for (int i = 0; i < cateArr.length; i++) {
-                        if (cateArr[i].contains(newText)) {
+                        if (cateArr[i].toLowerCase().contains(newText)) {
                             hintList.add(cateArr[i]);
                         }
                     }

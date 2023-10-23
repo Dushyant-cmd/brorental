@@ -11,15 +11,21 @@ import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
+import com.brorental.brorental.models.RentItemModel;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private String TAG = "MainBinding.java";
+    private RentListAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         binding.drawerLayout.addDrawerListener(mDrawerToggle);
         binding.searchLL.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +54,48 @@ public class MainActivity extends AppCompatActivity {
                 openFragment(new SearchFragment());
             }
         });
+
+        ArrayList<RentItemModel> list = new ArrayList<>();
+        list.add(new RentItemModel("223adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Audio", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("225adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Electronics", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("224adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Television", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("223adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Bike", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("225adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Car", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("224adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "House", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("223adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Mobile", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("225adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Fridge", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        list.add(new RentItemModel("224adf", "Delhi,India",
+                "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                "1000", "Bike", "Akljdlfjadlj", "20", "This is for rent",
+                "50", "Delhi", "live", "DL339900", "10:00PM - 11:00PM"));
+        adapter = new RentListAdapter(this);
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        binding.recyclerView.setAdapter(adapter);
+        adapter.submitList(list);
     }
 
     private void openFragment(SearchFragment searchFragment) {

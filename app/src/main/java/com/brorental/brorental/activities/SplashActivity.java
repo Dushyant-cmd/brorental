@@ -31,7 +31,6 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run: " + appClass.sharedPref.isFirstTime());
                 if(!appClass.sharedPref.isFirstTime()) {
                     if(!appClass.sharedPref.isLogin()) {
                         Intent i = new Intent(SplashActivity.this, SignUpAndLogin.class);

@@ -1,0 +1,517 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<layout>-->
+<!--    <data>-->
+<!--    </data>-->
+<!--    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--        xmlns:tools="http://schemas.android.com/tools"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:id="@+id/rootView"-->
+<!--        android:background="@drawable/white_rect">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_marginHorizontal="@dimen/_10dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:background="@drawable/white_rect"-->
+<!--            android:orientation="vertical"-->
+<!--            android:paddingBottom="@dimen/_10dp"-->
+<!--            tools:context=".fragments.AddresFragment">-->
+
+<!--            <CheckBox-->
+<!--                android:id="@+id/asPerAadhaarCB"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="8dp"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                android:padding="4dp"-->
+<!--                android:text="Communication address same as Aadhaar Address" />-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="@dimen/_8dp"-->
+<!--                android:background="@drawable/white_rect"-->
+<!--                android:orientation="vertical"-->
+<!--                android:paddingHorizontal="@dimen/_8dp"-->
+<!--                android:paddingBottom="@dimen/_10dp">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Address"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/address"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_8dp"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Address 2"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/address1"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Address 3"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/address2"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:text="@={model.add2}"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Landmark"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/landmark"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:text="@={model.lm}"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:inputType="text"-->
+<!--                    android:maxLength="6"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/pincode"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/pincode"-->
+<!--                    android:text="@={model.pinCode}"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:inputType="number"-->
+<!--                    android:maxLength="10"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/country"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <Spinner-->
+<!--                    android:selectedItemPosition="@={model.countryPos}"-->
+<!--                    android:id="@+id/countrySpinner"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_marginTop="@dimen/_8dp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/state"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <Spinner-->
+<!--                    android:selectedItemPosition="@={model.statePos}"-->
+<!--                    android:id="@+id/stateSpinner"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_marginTop="@dimen/_8dp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/city"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <Spinner-->
+<!--                    android:selectedItemPosition="@={model.cityPos}"-->
+<!--                    android:id="@+id/citySpinner"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:inputType="text" />-->
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/_10dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:drawableStart="@drawable/calender_icon"-->
+<!--                android:drawablePadding="@dimen/_8dp"-->
+<!--                android:fontFamily="@font/montserrat_regular"-->
+<!--                android:text="Nominee Details"-->
+<!--                android:textSize="16sp" />-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="@dimen/_8dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:background="@drawable/grey_bg"-->
+<!--                android:orientation="vertical"-->
+<!--                android:paddingHorizontal="@dimen/_8dp"-->
+<!--                android:paddingBottom="@dimen/_10dp">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/noAadharNomineeCB"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:padding="4dp"-->
+<!--                    android:text="Communication address different from Aadhaar Address"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Nominee Name"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:id="@+id/nomNameET"-->
+<!--                    android:text="@={model.nomName}"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter Nominee name"-->
+<!--                    android:inputType="text"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/dobTV"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:background="@drawable/dotted_border_card_white"-->
+<!--                    android:drawableStart="@drawable/calender_icon"-->
+<!--                    android:drawablePadding="@dimen/_8dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:gravity="center"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:text="Select D.O.B"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Relation with Customer"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.nomRel}"-->
+<!--                    android:id="@+id/nomRelET"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:inputType="text"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.nomAdd}"-->
+<!--                    android:id="@+id/nomineeAddress"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address1"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.nomAdd1}"-->
+<!--                    android:id="@+id/nomineeAddress1"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address2"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.nomAdd2}"-->
+<!--                    android:id="@+id/nomineeAddress2"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/_10dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:drawableStart="@drawable/calender_icon"-->
+<!--                android:drawablePadding="@dimen/_8dp"-->
+<!--                android:fontFamily="@font/montserrat_regular"-->
+<!--                android:text="Guardians Details"-->
+<!--                android:textSize="@dimen/_16sp" />-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="@dimen/_8dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:background="@drawable/grey_bg"-->
+<!--                android:orientation="vertical"-->
+<!--                android:paddingHorizontal="@dimen/_8dp"-->
+<!--                android:paddingBottom="@dimen/_10dp">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/guardianCB"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:padding="4dp"-->
+<!--                    android:text="Communication address different from Aadhaar Address"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Guardians Name"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                &lt;!&ndash;        <com.google.android.material.textfield.TextInputLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_marginTop="@dimen/_8dp">&ndash;&gt;-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.guardName}"-->
+<!--                    android:id="@+id/guardNameET"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter Guardian Name"-->
+<!--                    android:inputType="text"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+<!--                &lt;!&ndash;        </com.google.android.material.textfield.TextInputLayout>&ndash;&gt;-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/guardianDobTv"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:background="@drawable/dotted_border_card_white"-->
+<!--                    android:drawableStart="@drawable/calender_icon"-->
+<!--                    android:drawablePadding="@dimen/_8dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:gravity="center"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:text="Select D.O.B"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="Relation with Customer"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                &lt;!&ndash;        <com.google.android.material.textfield.TextInputLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_marginTop="@dimen/_8dp">&ndash;&gt;-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.guardRel}"-->
+<!--                    android:id="@+id/guardRelET"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:inputType="text"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+<!--                &lt;!&ndash;        </com.google.android.material.textfield.TextInputLayout>&ndash;&gt;-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                &lt;!&ndash;        <com.google.android.material.textfield.TextInputLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_marginTop="@dimen/_8dp">&ndash;&gt;-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.guardAdd}"-->
+<!--                    android:id="@+id/guardianAddress"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+<!--                &lt;!&ndash;        </com.google.android.material.textfield.TextInputLayout>&ndash;&gt;-->
+
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address1"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                &lt;!&ndash;        <com.google.android.material.textfield.TextInputLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_marginTop="@dimen/_8dp">&ndash;&gt;-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.guardAdd1}"-->
+<!--                    android:id="@+id/guardianAddress1"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+<!--                &lt;!&ndash;        </com.google.android.material.textfield.TextInputLayout>&ndash;&gt;-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/_15dp"-->
+<!--                    android:fontFamily="@font/montserrat_regular"-->
+<!--                    android:text="@string/address2"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+
+<!--                &lt;!&ndash;        <com.google.android.material.textfield.TextInputLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;            android:layout_marginTop="@dimen/_8dp">&ndash;&gt;-->
+
+<!--                <EditText-->
+<!--                    android:text="@={model.guardAdd2}"-->
+<!--                    android:id="@+id/guardianAddress2"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Enter the Address"-->
+<!--                    android:inputType="textMultiLine"-->
+<!--                    android:textSize="@dimen/_14sp" />-->
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/_15dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:drawableStart="@drawable/circular_gradient"-->
+<!--                android:drawablePadding="8dp"-->
+<!--                android:font="@font/montserrat_regular"-->
+<!--                android:text="Nomination under section 45ZA of the Banking-->
+<!--regulation ACT, 1949 and Rule2(1) of the banking Companies(Nomination) Rules,-->
+<!--1985 in Respect of bank deposit,"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textSize="@dimen/_14sp" />-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/_15dp"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:drawableStart="@drawable/circular_gradient"-->
+<!--                android:drawablePadding="8dp"-->
+<!--                android:font="@font/montserrat_regular"-->
+<!--                android:text="Nomination under section 45ZA of the Banking-->
+<!--regulation ACT, 1949 and Rule2(1) of the banking Companies(Nomination) Rules,-->
+<!--1985 in Respect of bank deposit,"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textSize="@dimen/_14sp" />-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/_15dp"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:paddingHorizontal="4dp">-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/submitBtn"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Submit"-->
+<!--                    android:textSize="16sp" />-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/backBtn"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Back"-->
+<!--                    android:textSize="16sp" />-->
+<!--            </LinearLayout>-->
+<!--        </LinearLayout>-->
+<!--    </androidx.core.widget.NestedScrollView>-->
+<!--</layout>-->

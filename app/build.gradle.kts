@@ -46,11 +46,13 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     //dots indicator
-    implementation ("com.tbuonomo:dotsindicator:5.0")
+    implementation("com.tbuonomo:dotsindicator:5.0")
     //firebase libraries
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     //pinview
-    implementation ("io.github.chaosleung:pinview:1.4.4")
+    implementation("io.github.chaosleung:pinview:1.4.4")
+    //Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
