@@ -2,18 +2,26 @@ package com.brorental.brorental.models;
 
 public class User {
 
-    private String name, mobile, pin, totalRent, totalRide;
+    private String name, mobile, pin, totalRent, totalRide, profileUrl;
     private boolean termsCheck;
 
-    public User(String name, String mobile, String pin, String totalRent, String totalRide, boolean termsCheck) {
+    public User(String name, String mobile, String pin, String totalRent, String totalRide, boolean termsCheck, String profileUrl) {
         this.name = name;
         this.mobile = mobile;
         this.pin = pin;
         this.totalRent = totalRent;
         this.totalRide = totalRide;
         this.termsCheck = termsCheck;
+        this.profileUrl = profileUrl;
     }
 
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
     public String getName() {
         return name;
     }

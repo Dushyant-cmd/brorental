@@ -1,6 +1,7 @@
 package com.brorental.brorental.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,11 +14,10 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.brorental.brorental.R;
+import com.brorental.brorental.activities.RentDetailsActivity;
 import com.brorental.brorental.databinding.RentListItemBinding;
 import com.brorental.brorental.models.RentItemModel;
 import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
 
 public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.ViewHolder> {
     private Context ctx;
@@ -57,6 +57,14 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
 
         Glide.with(ctx).load(data.getAdsImageUrl()).placeholder(R.drawable.american_flag)
                 .into(holder.binding.pdImgView);
+
+        holder.binding.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ctx, RentDetailsActivity.class);
+                ctx.startActivity(i);
+            }
+        });
     }
     class ViewHolder extends RecyclerView.ViewHolder {
         public RentListItemBinding binding;

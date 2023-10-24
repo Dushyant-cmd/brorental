@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:id="@+id/root"
         app:cardCornerRadius="8dp">
 
         <LinearLayout
@@ -30,9 +31,9 @@
                     <ImageView
                         android:id="@+id/pdImgView"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="120dp"
+                        android:paddingBottom="@dimen/_15dp"
                         android:contentDescription="@null"
-                        android:paddingBottom="8dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_launcher_background"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -119,14 +120,6 @@
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/detBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="View"
-                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

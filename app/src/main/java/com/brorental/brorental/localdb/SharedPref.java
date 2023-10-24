@@ -36,7 +36,8 @@ public class SharedPref {
     public User getUser() {
         return new User(sharedPreferences.getString("name", ""), sharedPreferences.getString("mobile", "")
         , sharedPreferences.getString("pin", ""), sharedPreferences.getString("totalRent", ""),
-                sharedPreferences.getString("totalRide", ""), sharedPreferences.getBoolean("termsCheck", false));
+                sharedPreferences.getString("totalRide", ""), sharedPreferences.getBoolean("termsCheck", false)
+        , sharedPreferences.getString("profileUrl", ""));
     }
     public void saveUser(User user) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -46,6 +47,7 @@ public class SharedPref {
         editor.putString("totalRide", user.getTotalRide());
         editor.putString("pin", user.getPin());
         editor.putBoolean("termsCheck", user.isTermsCheck());
+        editor.putString("profileUrl", user.getProfileUrl());
         editor.apply();
     }
 

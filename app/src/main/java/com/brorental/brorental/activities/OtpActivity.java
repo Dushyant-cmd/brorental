@@ -52,7 +52,7 @@ public class OtpActivity extends AppCompatActivity {
 
     //verificationId store verificationId returns from firebase auth when otp sent successfully
     private String mVerificationId;
-    private String name, pin, totalRide, totalRent;
+    private String name, pin, totalRide, totalRent, profileUrl;
     private boolean termsCheck;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
@@ -146,7 +146,7 @@ public class OtpActivity extends AppCompatActivity {
                                         finish();
                                         sharedPreferences.setLogin(true);
                                         sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
-                                                totalRide, true));
+                                                totalRide, true, profileUrl));
                                         Log.d(TAG, "onComplete: " + task.getResult());
                                     } else {
                                         Log.d(TAG, "onComplete: " + task.getException());
@@ -379,8 +379,9 @@ public class OtpActivity extends AppCompatActivity {
                         finish();
                         dialog.dismiss();
                         sharedPreferences.setLogin(true);
-                        sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
-                                totalRide, true));
+                        sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"),
+                                d.getString("totalRent"),
+                                d.getString("totalRide"), true, d.getString("profileUrl")));
                     } else {
                         dialog.dismiss();
                         name = d.getString("name");
@@ -388,6 +389,7 @@ public class OtpActivity extends AppCompatActivity {
                         totalRent = d.getString("totalRent");
                         totalRide = d.getString("totalRide");
                         termsCheck = d.getBoolean("termsCheck");
+                        profileUrl = d.getString("profileUrl");
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -415,6 +417,7 @@ public class OtpActivity extends AppCompatActivity {
                                                             map2.put("totalRentItem", "0");
                                                             map2.put("totalRides", "0");
                                                             map2.put("termsCheck", false);
+                                                            map2.put("profileUrl", "");
 
                                                             mFirestore.collection("users")
                                                                     .document(pin).set(map2).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -427,7 +430,7 @@ public class OtpActivity extends AppCompatActivity {
                                                                             finish();
                                                                             dialog.dismiss();
                                                                             sharedPreferences.setLogin(true);
-                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false));
+                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, ""));
                                                                             binding.otpLl.setVisibility(View.GONE);
                                                                             binding.otpLl.setVisibility(View.VISIBLE);
                                                                             Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();
@@ -463,7 +466,6 @@ public class OtpActivity extends AppCompatActivity {
     //check mobile device is connected to network or not.
     private boolean isNetworkConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
         boolean connected = (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED);
         return connected;
     }
