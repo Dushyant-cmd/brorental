@@ -61,9 +61,11 @@ public class SplashActivity extends AppCompatActivity {
                 .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot d) {
+                        Log.d(TAG, "onSuccess: " + d);
                         appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
-                                d.getString("totalRent"),
-                                d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
+                                d.getString("totalRent"), d.getString("totalRide"), true,
+                                d.getString("profileUrl"), d.getString("wallet")));
+                        Log.d(TAG, "onSuccess: " + appClass.sharedPref.getUser().getWallet() + "," + d.getString("wallet"));
                         Intent i = new Intent(SplashActivity.this, MainActivity.class);
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);

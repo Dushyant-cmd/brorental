@@ -29,11 +29,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 
 public class RentDetailsActivity extends AppCompatActivity {
@@ -114,7 +111,7 @@ public class RentDetailsActivity extends AppCompatActivity {
         public static String TAG = "PayBottomSheet.java";
         public String advertId = "";
         String fromDate = "", toDate = "";
-
+        long fromTS, toTS;
         public PayBottomSheet(String advertId) {
             this.advertId = advertId;
         }
@@ -144,6 +141,8 @@ public class RentDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                             fromDate = dayOfMonth + "-" + month + "-" + year;
+                            calendar.set(year, month, dayOfMonth);
+                            fromTS = calendar.getTimeInMillis();
                             TimePickerDialog timeDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -169,19 +168,15 @@ public class RentDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                             toDate = dayOfMonth + "-" + month + "-" + year;
+                            calendar.set(year, month, dayOfMonth);
+                            toTS = calendar.getTimeInMillis();
                             TimePickerDialog timeDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                     try {
                                         toDate += " " + hourOfDay + ":" + minute;
-                                        SimpleDateFormat spf = new SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.getDefault());
-                                        Date d = spf.parse(fromDate);
-                                        Date d2 = spf.parse(toDate);
-                                        long diffHour = ((d.getTime() - d2.getTime()) / (1000 * 60 * 60)) % 24;
-//                                        long toHour = ((d2.getTime() / (1000 * 60 * 60)) % 24);
+                                        long todayHour = getHours();
                                         binding.toET.setText(toDate);
-                                        Log.d(TAG, "onCreateView time1: " + d.getTime() + "," + diffHour);
-                                        Log.d(TAG, "onCreateView time2: " + d2.getTime());
                                     } catch (Exception e) {
                                         Log.d(TAG, "onCatch to date: " + e);
                                     }
@@ -196,6 +191,10 @@ public class RentDetailsActivity extends AppCompatActivity {
                 }
             });
             return binding.getRoot();
+        }
+
+        private long getHours() {
+            return 0;
         }
     }
 }
