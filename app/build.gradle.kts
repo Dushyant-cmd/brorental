@@ -55,4 +55,16 @@ dependencies {
     implementation("io.github.chaosleung:pinview:1.4.4")
     //Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.google.code.gson:gson:2.9.1")
+
+    implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
+
+    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.25")
+
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

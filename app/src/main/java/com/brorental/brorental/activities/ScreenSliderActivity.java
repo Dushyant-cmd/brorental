@@ -38,7 +38,7 @@ public class ScreenSliderActivity extends AppCompatActivity {
     private void setListeners() {
         binding.skipBtn.setOnClickListener(view -> {
             application.sharedPref.setFirstTime(false);
-            Intent i = new Intent(ScreenSliderActivity.this, MainActivity.class);
+            Intent i = new Intent(ScreenSliderActivity.this, SignUpAndLogin.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
         });

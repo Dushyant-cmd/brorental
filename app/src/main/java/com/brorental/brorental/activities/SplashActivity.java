@@ -8,13 +8,18 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.Locale;
 
@@ -38,10 +43,7 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(i);
                         finish();
                     } else {
-                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                        finish();
+                        getProfile();
                     }
                 } else {
                     appClass.sharedPref.setFirstTime(false);
@@ -52,6 +54,31 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         }, 2000);
+    }
+
+    private void getProfile() {
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot d) {
+                        appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
+                                d.getString("totalRent"),
+                                d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure: " + e);
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    }
+                });
     }
 
     public void setLocale(String lang) {

@@ -2,6 +2,7 @@ package com.brorental.brorental.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,9 @@ import com.brorental.brorental.activities.RentDetailsActivity;
 import com.brorental.brorental.databinding.RentListItemBinding;
 import com.brorental.brorental.models.RentItemModel;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.ViewHolder> {
     private Context ctx;
@@ -62,6 +66,9 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(ctx, RentDetailsActivity.class);
+                Gson gson = new Gson();
+                String json = gson.toJson(data);
+                i.putExtra("data", json);
                 ctx.startActivity(i);
             }
         });

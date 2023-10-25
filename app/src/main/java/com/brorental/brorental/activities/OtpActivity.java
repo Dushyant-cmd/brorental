@@ -52,7 +52,7 @@ public class OtpActivity extends AppCompatActivity {
 
     //verificationId store verificationId returns from firebase auth when otp sent successfully
     private String mVerificationId;
-    private String name, pin, totalRide, totalRent, profileUrl;
+    private String name, pin, totalRide, totalRent, profileUrl, wallet;
     private boolean termsCheck;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
@@ -146,7 +146,7 @@ public class OtpActivity extends AppCompatActivity {
                                         finish();
                                         sharedPreferences.setLogin(true);
                                         sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
-                                                totalRide, true, profileUrl));
+                                                totalRide, true, profileUrl, wallet));
                                         Log.d(TAG, "onComplete: " + task.getResult());
                                     } else {
                                         Log.d(TAG, "onComplete: " + task.getException());
@@ -381,7 +381,7 @@ public class OtpActivity extends AppCompatActivity {
                         sharedPreferences.setLogin(true);
                         sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"),
                                 d.getString("totalRent"),
-                                d.getString("totalRide"), true, d.getString("profileUrl")));
+                                d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
                     } else {
                         dialog.dismiss();
                         name = d.getString("name");
@@ -390,6 +390,7 @@ public class OtpActivity extends AppCompatActivity {
                         totalRide = d.getString("totalRide");
                         termsCheck = d.getBoolean("termsCheck");
                         profileUrl = d.getString("profileUrl");
+                        wallet = d.getString("wallet");
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -430,7 +431,7 @@ public class OtpActivity extends AppCompatActivity {
                                                                             finish();
                                                                             dialog.dismiss();
                                                                             sharedPreferences.setLogin(true);
-                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, ""));
+                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, "", "0"));
                                                                             binding.otpLl.setVisibility(View.GONE);
                                                                             binding.otpLl.setVisibility(View.VISIBLE);
                                                                             Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();

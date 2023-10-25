@@ -2,10 +2,10 @@ package com.brorental.brorental.models;
 
 public class User {
 
-    private String name, mobile, pin, totalRent, totalRide, profileUrl;
+    private String name, mobile, pin, totalRent, totalRide, profileUrl, wallet;
     private boolean termsCheck;
 
-    public User(String name, String mobile, String pin, String totalRent, String totalRide, boolean termsCheck, String profileUrl) {
+    public User(String name, String mobile, String pin, String totalRent, String totalRide, boolean termsCheck, String profileUrl, String wallet) {
         this.name = name;
         this.mobile = mobile;
         this.pin = pin;
@@ -13,6 +13,15 @@ public class User {
         this.totalRide = totalRide;
         this.termsCheck = termsCheck;
         this.profileUrl = profileUrl;
+        this.wallet = wallet;
+    }
+
+    public String getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(String wallet) {
+        this.wallet = wallet;
     }
 
     public String getProfileUrl() {

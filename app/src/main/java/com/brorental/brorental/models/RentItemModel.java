@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class RentItemModel {
     public String id;
-    private String address, adsImageUrl, broPartnerId, category, docId, extraCharge, ownerDescription, perHourCharge, state, status, vehicleNumber, timings;
+    private String address, adsImageUrl, broPartnerId, category, docId, extraCharge, ownerDescription, perHourCharge, state, status, vehicleNumber, timings, year, productHealth, productColor, name;
 
-    public RentItemModel(String id, String address, String adsImageUrl, String broPartnerId, String category, String docId, String extraCharge, String ownerDescription, String perHourCharge, String state, String status, String vehicleNumber, String timings) {
+    public RentItemModel(String id, String address, String adsImageUrl, String broPartnerId, String category, String docId, String extraCharge, String ownerDescription, String perHourCharge, String state, String status, String vehicleNumber, String timings, String year, String productHealth, String productColor, String name) {
         this.id = id;
         this.address = address;
         this.adsImageUrl = adsImageUrl;
@@ -20,6 +20,42 @@ public class RentItemModel {
         this.status = status;
         this.vehicleNumber = vehicleNumber;
         this.timings = timings;
+        this.year = year;
+        this.productHealth = productHealth;
+        this.productColor = productColor;
+        this.name = name;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getProductHealth() {
+        return productHealth;
+    }
+
+    public void setProductHealth(String productHealth) {
+        this.productHealth = productHealth;
+    }
+
+    public String getProductColor() {
+        return productColor;
+    }
+
+    public void setProductColor(String productColor) {
+        this.productColor = productColor;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getId() {
