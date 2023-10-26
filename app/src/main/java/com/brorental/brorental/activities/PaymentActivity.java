@@ -250,6 +250,7 @@ public class PaymentActivity extends AppCompatActivity {
                                             map2.put("totalHours", hours);
                                             map2.put("perHourCharge", model.getPerHourCharge());
                                             map2.put("paymentMode", "online");
+                                            map2.put("timestamp", System.currentTimeMillis());
                                             firestore.collection("rentHistory").add(map2)
                                                             .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                                                 @Override

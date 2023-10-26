@@ -7,9 +7,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
+import com.brorental.brorental.fragments.SearchFragment;
 
 import java.util.ArrayList;
 
@@ -17,8 +21,12 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
     private Context ctx;
     private String TAG = "HintAdapter.java";
     private ArrayList<String> list;
+    private MainActivity hostAct;
+    private SearchFragment hostFrag;
 
-    public HintAdapter(Context ctx, ArrayList<String> list) {
+    public HintAdapter(Context ctx, ArrayList<String> list, Fragment fragment) {
+        hostAct = (MainActivity) ctx;
+        hostFrag = (SearchFragment)  fragment;
         this.ctx = ctx;
         this.list = list;
     }
@@ -33,6 +41,12 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull HintAdapter.ViewHolder holder, int position) {
         String str = list.get(position);
         holder.hintTV.setText(str);
+        holder.hintTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hostFrag.refresh(position);
+            }
+        });
     }
 
     @Override

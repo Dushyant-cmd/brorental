@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         binding.drawerLayout.addDrawerListener(mDrawerToggle);
 
         setListners();
-        getData();
+        getData("", "");
         adapter = new RentListAdapter(this);
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerView.setAdapter(adapter);
@@ -159,12 +160,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getData() {
-        mFirestore.collection("rent").limit(10).get()
+    public void getData(String selectedState, String category) {
+        Log.d(TAG, "getData: " + selectedState + "," + category);
+        Query query = mFirestore.collection("rent").limit(10);
+        if(!selectedState.isEmpty()) {
+            query = mFirestore.collection("rent").whereEqualTo("state", selectedState)
+                    .whereEqualTo("category", category).limit(10);
+        }
+        query.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()) {
+                            list.clear();
                             List<DocumentSnapshot> docList = task.getResult().getDocuments();
                             for(int i=0; i<docList.size(); i++) {
                                 DocumentSnapshot d = docList.get(i);
@@ -178,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             adapter.notifyDataSetChanged();
+                            Log.d(TAG, "onComplete: " + docList.size());
                         } else {
                             Log.d(TAG, "onComplete: " + task.getException());
                         }
