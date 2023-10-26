@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.brorental.brorental.R;
 import com.brorental.brorental.localdb.SharedPref;
+import com.brorental.brorental.models.RentItemModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,6 +26,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,23 +37,41 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
 
 
 public class PaymentActivity extends AppCompatActivity {
     FirebaseFirestore firestore;
     SharedPref sharedPreferences;
-    String rechargeAmt, advertId;
+    String rechargeAmt, advertId, broPartnerId, rentStart, rentEnd, hours;
     String tag = "PaymentActivity.java";
     final int UPI_PAYMENT = 0;
     private String TAG = "PaymentActivity.java";
+    private JSONObject jsonData;
+    private RentItemModel model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
         firestore = FirebaseFirestore.getInstance();
         sharedPreferences = new SharedPref(PaymentActivity.this);
-        rechargeAmt = getIntent().getStringExtra("amt");
-        advertId = getIntent().getStringExtra("id");
+        try {
+            if(getIntent().hasExtra("rentBundle")) {
+                Bundle bundle = getIntent().getBundleExtra("rentBundle");
+                rechargeAmt = bundle.getString("amt");
+                advertId = bundle.getString("id");
+                jsonData = new JSONObject(Objects.requireNonNull(bundle.getString("data")));
+                model = new Gson().fromJson(String.valueOf(jsonData), RentItemModel.class);
+                broPartnerId = jsonData.getString("broPartnerId");
+                hours = String.valueOf(bundle.getLong("hours"));
+                rentStart = bundle.getString("rentStartDate");
+                rentEnd = bundle.getString("rentEndDate");
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "onCreate: " + e);
+        }
+
         Log.d(TAG, "onCreate: " + sharedPreferences.getUser().getWallet());
         if (isNetworkConnected()) {
             queries();
@@ -67,8 +89,6 @@ public class PaymentActivity extends AppCompatActivity {
                             try {
                                 //Upi transaction with Intent
                                 payUsingUpi(rechargeAmt, task.getResult().getString("upi"), "BroRental", "BroRental Cooperation");
-                                //Upi transaction with EasyUpiPayment library.
-//                                makePayment(Double.parseDouble(rechargeAmt), task.getResult().getString("upi"), "zupee", "zupee corporation", "123");
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Toast.makeText(getApplicationContext(), "No Upi App is Found", Toast.LENGTH_LONG).show();
@@ -180,8 +200,6 @@ public class PaymentActivity extends AppCompatActivity {
             }
 
             if (status.equals("success")) {
-                //Code to handle successful transaction here.
-                Toast.makeText(PaymentActivity.this, "Transaction successful.", Toast.LENGTH_SHORT).show();
                 // on below line we are getting details about transaction when completed.
                 String transactionDet = "done";
                 String transactionAmt = rechargeAmt;
@@ -213,13 +231,37 @@ public class PaymentActivity extends AppCompatActivity {
                                     map.put("timestamp", System.currentTimeMillis());
                                     map.put("isBroRental", true);
                                     map.put("broRentalId", sharedPreferences.getUser().getPin());
-                                    map.put("isBroPartner", false);
-                                    map.put("broPartnerId", "");
+                                    map.put("broPartnerId", broPartnerId);
                                     firestore.collection("transactions").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override
                                         public void onSuccess(DocumentReference documentReference) {
-                                            Log.v(tag, "success");
-                                            Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                            HashMap<String, Object> map2 = new HashMap<>();
+                                            map2.put("rentImages", model.getAdsImageUrl());
+                                            map2.put("name", model.getName());
+                                            map2.put("advertisementId", model.getId());
+                                            map2.put("totalRentCost", rechargeAmt);
+                                            map2.put("extraCharge", model.getExtraCharge());
+                                            map2.put("id", UUID.randomUUID().toString());
+                                            map2.put("rentStartTime", rentStart);
+                                            map2.put("rentEndTime", rentEnd);
+                                            map2.put("broRentalId", sharedPreferences.getUser().getPin());
+                                            map2.put("broPartnerId", broPartnerId);
+                                            map2.put("status", "pending");
+                                            map2.put("totalHours", hours);
+                                            map2.put("perHourCharge", model.getPerHourCharge());
+                                            map2.put("paymentMode", "online");
+                                            firestore.collection("rentHistory").add(map2)
+                                                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                                    if(task.isSuccessful()) {
+                                                                        Log.v(tag, "success");
+                                                                        Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                    } else {
+                                                                        Log.d(TAG, "onComplete: " + task.getException());
+                                                                    }
+                                                                }
+                                                            });
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
