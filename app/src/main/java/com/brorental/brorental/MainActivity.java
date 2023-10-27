@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +26,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.brorental.brorental.activities.PaymentActivity;
+import com.brorental.brorental.activities.PaymentHistory;
 import com.brorental.brorental.activities.ProfileActivity;
 import com.brorental.brorental.activities.SignUpAndLogin;
 import com.brorental.brorental.adapters.RentListAdapter;
@@ -34,6 +40,7 @@ import com.brorental.brorental.utilities.DialogCustoms;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -88,9 +95,12 @@ public class MainActivity extends AppCompatActivity {
         //header listeners and dynamic text.
         View headerView = binding.navigationView.getHeaderView(0);
         TextView walletTV = headerView.findViewById(R.id.walletTV);
-        ImageView imageView = (ImageView) headerView.findViewById(R.id.profileIV);
-        TextView viewProfileTV = (TextView) headerView.findViewById(R.id.viewProfileTV);
+        ImageView imageView = headerView.findViewById(R.id.profileIV);
+        TextView viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
+        TextView nameTV = headerView.findViewById(R.id.nameTV);
+        LinearLayout walletLL = headerView.findViewById(R.id.walletLL);
         walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
+        nameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load("https://i.stack.imgur.com/l60Hf.png").into(imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -109,10 +119,46 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.addCashBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomSheetDialog sheet = new BottomSheetDialog(MainActivity.this);
+                View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_cash_sheet, null);
+                sheet.setContentView(view);
+                Button submitBtn = view.findViewById(R.id.confirmRec);
+                Button cancelBtn = view.findViewById(R.id.cancelRec);
+                EditText rechargeET = view.findViewById(R.id.rechargeAmt);
+                submitBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(MainActivity.this, PaymentActivity.class);
+                        i.putExtra("addCash", true);
+                        i.putExtra("amt", rechargeET.getText().toString());
+                        startActivity(i);
+                        sheet.dismiss();
+                    }
+                });
+                cancelBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sheet.dismiss();
+                    }
+                });
+                sheet.show();
+            }
+        });
         binding.searchLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openFragment(new SearchFragment());
+            }
+        });
+
+        walletLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, PaymentHistory.class);
+                startActivity(i);
             }
         });
 

@@ -20,6 +20,8 @@ import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.adapters.HintAdapter;
 import com.brorental.brorental.databinding.FragmentSearchBinding;
+import com.brorental.brorental.interfaces.UtilsInterface;
+import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.Utility;
@@ -36,6 +38,7 @@ public class SearchFragment extends Fragment {
     public FragmentSearchBinding binding;
     private String TAG = "SearchFragment.java", selectedState = "";
     private ArrayList<String> hintList = new ArrayList<>();
+    private AppClass appClass;
     private HintAdapter adapter;
     private FirebaseFirestore mFirestore;
     private String[] cateArr;
@@ -45,7 +48,8 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
-        adapter = new HintAdapter(getActivity(), hintList, this);
+        adapter = new HintAdapter(getActivity(), hintList);
+        appClass = (AppClass) getActivity().getApplication();
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.recyclerView.setAdapter(adapter);
         mFirestore = ((AppClass) getActivity().getApplication()).firestore;
@@ -58,6 +62,12 @@ public class SearchFragment extends Fragment {
         }
 
         binding.searchView.requestFocus();
+        setListeners();
+
+        return binding.getRoot();
+    }
+
+    private void setListeners() {
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -66,7 +76,7 @@ public class SearchFragment extends Fragment {
                 if(catePosition < 0) {
                     DialogCustoms.showSnackBar(getActivity(), "Select Valid Category", binding.getRoot());
                 } else
-                    refresh(catePosition);
+                    adapter.refreshInterface.refresh(catePosition);
                 return false;
             }
 
@@ -88,8 +98,29 @@ public class SearchFragment extends Fragment {
                 return false;
             }
         });
+        adapter.addRefreshListener(new UtilsInterface.RefreshInterface() {
+            /**Below method will refresh list on MainActivity */
+            @Override
+            public void refresh(int catePosition) {
+                if(!stateList.isEmpty()) {
+                    try {
+                        MainActivity hostAct = (MainActivity) getActivity();
+                        hostAct.getData((String) binding.spinner.getSelectedItem(), hintList.get(catePosition));
+                        appClass.sharedPref.setState((String) binding.spinner.getSelectedItem());
+                        Utility.hideKeyboardFrom(getActivity(), getContext(), binding.getRoot(), true);
+                        hostAct.getSupportFragmentManager().popBackStackImmediate();
+                    } catch (IndexOutOfBoundsException e) {
+                        DialogCustoms.showSnackBar(getActivity(), "Select Valid Category", binding.getRoot());
+                    } catch (Exception e) {
+                        Log.d(TAG, "refresh: " + e);
+                    }
+                } else {
+                    DialogCustoms.showSnackBar(getActivity(), "Select state", binding.getRoot());
+                }
 
-        return binding.getRoot();
+
+            }
+        });
     }
 
     private void getState() {
@@ -101,6 +132,12 @@ public class SearchFragment extends Fragment {
                             Log.d(TAG, "onComplete: " + task.getResult().getString("state"));
                             String[] states = task.getResult().getString("state").split(",");
                             Collections.addAll(stateList, states);
+                            if(!appClass.sharedPref.getState().isEmpty()) {
+                                int selectedStatePos = stateList.indexOf(appClass.sharedPref.getState());
+                                stateList.remove(selectedStatePos);
+                                stateList.remove(0);
+                                stateList.add(0, appClass.sharedPref.getState());
+                            }
                             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, stateList);
                             binding.spinner.setAdapter(adapter);
                             binding.spinner.setVisibility(View.VISIBLE);
@@ -145,16 +182,5 @@ public class SearchFragment extends Fragment {
                         }
                     }
                 });
-    }
-
-    /**Below method will refresh list on MainActivity */
-    public void refresh(int catePosition) {
-        if(!stateList.isEmpty()) {
-            MainActivity hostAct = (MainActivity) getActivity();
-            hostAct.getData((String) binding.spinner.getSelectedItem(), cateArr[catePosition]);
-            hostAct.getSupportFragmentManager().popBackStackImmediate();
-        } else {
-            DialogCustoms.showSnackBar(getActivity(), "Select state", binding.getRoot());
-        }
     }
 }

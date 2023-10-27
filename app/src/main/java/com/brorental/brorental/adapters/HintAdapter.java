@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.fragments.SearchFragment;
+import com.brorental.brorental.interfaces.UtilsInterface;
 
 import java.util.ArrayList;
 
@@ -22,11 +23,10 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
     private String TAG = "HintAdapter.java";
     private ArrayList<String> list;
     private MainActivity hostAct;
-    private SearchFragment hostFrag;
+    public UtilsInterface.RefreshInterface refreshInterface;
 
-    public HintAdapter(Context ctx, ArrayList<String> list, Fragment fragment) {
+    public HintAdapter(Context ctx, ArrayList<String> list) {
         hostAct = (MainActivity) ctx;
-        hostFrag = (SearchFragment)  fragment;
         this.ctx = ctx;
         this.list = list;
     }
@@ -44,7 +44,7 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
         holder.hintTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hostFrag.refresh(position);
+                refreshInterface.refresh(position);
             }
         });
     }
@@ -60,5 +60,9 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
             super(view);
             hintTV = view.findViewById(R.id.hintTV);
         }
+    }
+
+    public void addRefreshListener(UtilsInterface.RefreshInterface refreshInterface) {
+        this.refreshInterface = refreshInterface;
     }
 }

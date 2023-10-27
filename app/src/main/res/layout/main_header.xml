@@ -19,6 +19,35 @@
         android:textColor="@color/black"
         android:textSize="16sp" />
 
+    <LinearLayout
+        android:id="@+id/walletLL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/_8dp"
+        android:background="@drawable/dotted_border_card_white"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="@null"
+            android:src="@drawable/wallet" />
+
+        <TextView
+            android:id="@+id/walletTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:text="\u20B9 40"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profileIV"
         android:layout_width="60dp"
@@ -28,19 +57,16 @@
         android:src="@drawable/profile_24" />
 
     <TextView
-        android:id="@+id/walletTV"
+        android:id="@+id/nameTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/profileIV"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:drawableStart="@drawable/baseline_wallet_24"
         android:drawablePadding="8dp"
         android:fontFamily="@font/montserrat_medium"
-        android:text="Aval Bal: 40Rs"
+        android:text="Guest_1002"
         android:textColor="@color/black"
         android:textSize="16sp" />
-
 
 </RelativeLayout>

@@ -56,6 +56,22 @@ public class SharedPref {
         sharedPreferences.edit().putString("wallet", wallet).apply();
     }
 
+    public void setState(String state) {
+        sharedPreferences.edit().putString("state", state).apply();
+    }
+
+    public String getState() {
+        return sharedPreferences.getString("state", "");
+    }
+
+    public String getAlternateMob() {
+        return sharedPreferences.getString("alternateMob", "");
+    }
+
+    public void setAlternateMob(String mob) {
+        sharedPreferences.edit().putString("alternateMOb", mob).apply();
+    }
+
     public void logout() {
         sharedPreferences.edit().clear().apply();
     }
