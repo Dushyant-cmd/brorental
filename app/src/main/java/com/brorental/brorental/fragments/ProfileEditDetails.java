@@ -34,6 +34,7 @@ import com.brorental.brorental.databinding.FragmentProfileDetailsBinding;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.StorageReference;
@@ -48,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 
 public class ProfileEditDetails extends Fragment {
     private FragmentProfileDetailsBinding binding;
@@ -64,51 +66,79 @@ public class ProfileEditDetails extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile_details, container, false);
         appClass = (AppClass) getActivity().getApplication();
+        dialog = new ProgressDialog(getActivity());
         setListeners();
         return binding.getRoot();
     }
+
     private void setListeners() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
+
         binding.saveTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //save user details
-                dialog = new ProgressDialog(getActivity());
+                dialog.setMessage("Please wait.");
                 dialog.show();
+                binding.saveTV.setEnabled(false);
                 StorageReference rootRef = appClass.storage.getReference();
-                StorageReference profileRef = rootRef.child("/profile");
-                StorageReference dLRef = rootRef.child("/drivingLicense");
-                StorageReference aadhaarRef = rootRef.child("/aadhaar");
+                String profilePath = "profile/" + UUID.randomUUID().toString();
+                String dLPath = "drivingLicense/" + UUID.randomUUID().toString();
+                String aadhaarPath = "aadhaar/" + UUID.randomUUID().toString();
+                StorageReference profileRef = rootRef.child(profilePath);
+                StorageReference dLRef = rootRef.child(dLPath);
+                StorageReference aadhaarRef = rootRef.child(aadhaarPath);
                 String name = binding.nameET.getText().toString();
                 String altMob = binding.altMobET.getText().toString();
 
-                HashMap<String, Object> map = new HashMap<>();
-                if (altMob.charAt(0) != '6' && altMob.charAt(0) != '7' && altMob.charAt(0) != '8' && altMob.charAt(0) != '9') {
-                    if(!altMob.isEmpty()) {
-                        map.put("alternateMobile", altMob);
-                    } else
-                        return;
-                }
-                else
+                if (name.isEmpty() && altMob.isEmpty() && fileAadhaarImage == null && fileProfileImage == null && fileDLImage == null) {
+                    DialogCustoms.showSnackBar(getActivity(), "Enter details to edit.", binding.getRoot());
+                    dialog.dismiss();
                     return;
+                }
+
+                HashMap<String, Object> map = new HashMap<>();
+                if (!altMob.isEmpty()) {
+                    if (Long.parseLong(String.valueOf(altMob.charAt(0))) >= 6 && altMob.length() > 9) {
+                        map.put("alternateMobile", altMob);
+                    } else {
+                        binding.altMobET.setError("Invalid");
+                        dialog.dismiss();
+                        return;
+                    }
+                }
+
                 if (!name.isEmpty())
                     map.put("name", name);
 
                 if (!map.isEmpty()) {
                     appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
-                        .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    dialog.dismiss();
-                                    Log.d(TAG, "onComplete: success");
-                                } else {
-                                    Log.d(TAG, "onComplete: " + task.getException());
+                            .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        dialog.dismiss();
+                                        appClass.sharedPref.setAlternateMob(altMob);
+                                        Log.d(TAG, "onComplete: success");
+                                        if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)
+                                            getActivity().onBackPressed();
+                                    } else {
+                                        dialog.dismiss();
+                                        Log.d(TAG, "onComplete: " + task.getException());
+                                    }
                                 }
-                            }
-                        });
-                }
+                            });
+                } else
+                    dialog.dismiss();
 
                 if (fileAadhaarImage != null) {
+                    if(!dialog.isShowing())
+                        dialog.show();
                     aadhaarRef.putFile(Uri.fromFile(fileAadhaarImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -116,9 +146,15 @@ public class ProfileEditDetails extends Fragment {
                                 aadhaarRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
-                                        dialog.show();
-                                        saveImageUrl("aadhaarImgUrl", uri);
+                                        fileAadhaarImage = null;
+                                        saveImageUrl("aadhaarImgUrl", uri, "aadhaarImgPath", aadhaarPath);
                                         Log.d(TAG, "onComplete: aadhaar success");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "onFailure aadhaar image.: " + e);
+                                        dialog.dismiss();
                                     }
                                 });
                             } else {
@@ -129,6 +165,8 @@ public class ProfileEditDetails extends Fragment {
                 }
 
                 if (fileProfileImage != null) {
+                    if(!dialog.isShowing())
+                        dialog.show();
                     profileRef.putFile(Uri.fromFile(fileProfileImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -136,9 +174,15 @@ public class ProfileEditDetails extends Fragment {
                                 profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
-                                        dialog.show();
-                                        saveImageUrl("profileImageUrl", uri);
+                                        fileProfileImage = null;
+                                        saveImageUrl("profileUrl", uri, "profileImgPath", profilePath);
                                         Log.d(TAG, "onComplete: profile success");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        Log.d(TAG, "onFailure: " + e);
+                                        dialog.dismiss();
                                     }
                                 });
                             } else {
@@ -149,6 +193,8 @@ public class ProfileEditDetails extends Fragment {
                 }
 
                 if (fileDLImage != null) {
+                    if(!dialog.isShowing())
+                        dialog.show();
                     dLRef.putFile(Uri.fromFile(fileDLImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -156,9 +202,14 @@ public class ProfileEditDetails extends Fragment {
                                 dLRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
+                                        fileDLImage = null;
                                         Log.d(TAG, "onComplete: success");
-                                        dialog.show();
-                                        saveImageUrl("drivingLicenseImg", uri);
+                                        saveImageUrl("drivingLicenseImg", uri, "drivingLicImgPath", dLPath);
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        dialog.dismiss();
                                     }
                                 });
                             } else {
@@ -296,22 +347,29 @@ public class ProfileEditDetails extends Fragment {
         });
     }
 
-    private void saveImageUrl(String key, Uri uri) {
+    private void saveImageUrl(String key, Uri uri, String imagePathKey, String imagePath) {
         HashMap<String, Object> map = new HashMap<>();
         map.put(key, uri.toString());
+        map.put(imagePathKey, imagePath);
 
         appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
                 .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
+                            appClass.sharedPref.setProfileUrl(uri.toString());
+                            dialog.dismiss();
+                            if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)
+                                requireActivity().onBackPressed();
                             Log.d(TAG, "onComplete: success");
                         } else {
+                            dialog.dismiss();
                             Log.d(TAG, "onComplete: " + task.getException());
                         }
                     }
                 });
     }
+
     private Intent getCameraIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         takePictureIntent.putExtra("android.intent.extras.CAMERA_FACING", 0);
@@ -548,4 +606,8 @@ public class ProfileEditDetails extends Fragment {
         return true;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 }

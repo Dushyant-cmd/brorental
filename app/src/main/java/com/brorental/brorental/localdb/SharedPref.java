@@ -52,6 +52,10 @@ public class SharedPref {
         editor.apply();
     }
 
+    public void setProfileUrl(String url) {
+        sharedPreferences.edit().putString("profileUrl", url).apply();
+    }
+
     public void setWallet(String wallet) {
         sharedPreferences.edit().putString("wallet", wallet).apply();
     }

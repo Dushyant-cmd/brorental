@@ -1,6 +1,5 @@
 package com.brorental.brorental;
 
-import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -26,14 +25,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.brorental.brorental.activities.HistoryActivity;
 import com.brorental.brorental.activities.PaymentActivity;
 import com.brorental.brorental.activities.PaymentHistory;
 import com.brorental.brorental.activities.ProfileActivity;
+import com.brorental.brorental.activities.RideActivity;
 import com.brorental.brorental.activities.SignUpAndLogin;
 import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
-import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
         nameTV.setText(appClass.sharedPref.getUser().getName());
 
-        Glide.with(this).load("https://i.stack.imgur.com/l60Hf.png").into(imageView);
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,10 +172,10 @@ public class MainActivity extends AppCompatActivity {
                 } else if(id == R.id.rent) {
                     binding.drawerLayout.close();
                 } else if(id == R.id.driving) {
-                    Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+                    Intent i = new Intent(MainActivity.this, RideActivity.class);
                     startActivity(i);
                 } else if(id == R.id.history) {
-                    Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+                    Intent i = new Intent(MainActivity.this, HistoryActivity.class);
                     startActivity(i);
                 } else if(id == R.id.termsCon) {
                     DialogCustoms.showSnackBar(MainActivity.this, "Terms & Conditions", binding.getRoot());

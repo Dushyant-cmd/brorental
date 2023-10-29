@@ -24,9 +24,9 @@ public class ProfileActivity extends AppCompatActivity {
         binding.nameTV.setText(appClass.sharedPref.getUser().getName());
         binding.pinTV.setText("Pin: " + appClass.sharedPref.getUser().getPin());
         binding.mobTV.setText("Mobile: " + appClass.sharedPref.getUser().getMobile());
-        binding.mobTV.setText("Alternate Mobile: " + appClass.sharedPref.getAlternateMob());
+        binding.altMobTV.setText("Alternate Mobile: " + appClass.sharedPref.getAlternateMob());
 
-        Glide.with(this).load("https://i.stack.imgur.com/l60Hf.png").into(binding.profileCirIV);
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(binding.profileCirIV);
         setListeners();
     }
 
