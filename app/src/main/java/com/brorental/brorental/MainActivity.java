@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -24,6 +25,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.brorental.brorental.activities.HistoryActivity;
 import com.brorental.brorental.activities.PaymentActivity;
@@ -37,11 +39,13 @@ import com.brorental.brorental.fragments.SearchFragment;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.Utility;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -84,7 +88,26 @@ public class MainActivity extends AppCompatActivity {
         binding.drawerLayout.addDrawerListener(mDrawerToggle);
 
         setListners();
-        getData("", "");
+        if(Utility.isNetworkAvailable(this)) {
+            getData("", "");
+        } else {
+            Snackbar bar = Snackbar.make(binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
+            bar.setAction("connect", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(Utility.isNetworkAvailable(MainActivity.this)) {
+                        getData("", "");
+                        bar.dismiss();
+                        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+                    } else {
+                        bar.dismiss();
+                        bar.show();
+                    }
+                }
+            });
+
+            bar.show();
+        }
         adapter = new RentListAdapter(this);
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerView.setAdapter(adapter);
@@ -204,10 +227,19 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        binding.swipeRef.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getData("", "");
+            }
+        });
     }
 
     public void getData(String selectedState, String category) {
         Log.d(TAG, "getData: " + selectedState + "," + category);
+        binding.shimmer.setVisibility(View.VISIBLE);
+        binding.recyclerView.setVisibility(View.GONE);
         Query query = mFirestore.collection("rent").limit(10);
         if(!selectedState.isEmpty()) {
             query = mFirestore.collection("rent").whereEqualTo("state", selectedState)
@@ -217,6 +249,9 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        binding.swipeRef.setRefreshing(false);
+                        binding.shimmer.setVisibility(View.GONE);
+                        binding.recyclerView.setVisibility(View.VISIBLE);
                         if(task.isSuccessful()) {
                             list.clear();
                             List<DocumentSnapshot> docList = task.getResult().getDocuments();

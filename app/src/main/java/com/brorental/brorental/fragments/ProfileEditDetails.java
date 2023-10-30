@@ -57,7 +57,7 @@ public class ProfileEditDetails extends Fragment {
     private boolean isAadhaarUpload = false, isDLUpload = false, isProfileUpload = false;
     private AppClass appClass;
     private File fileAadhaarImage, fileDLImage, fileProfileImage;
-    private String currentPhotoPath;
+    private String currentPhotoPath, profilePath, dLPath, aadhaarPath;
     private ProgressDialog dialog;
 
     @Override
@@ -87,9 +87,19 @@ public class ProfileEditDetails extends Fragment {
                 dialog.show();
                 binding.saveTV.setEnabled(false);
                 StorageReference rootRef = appClass.storage.getReference();
-                String profilePath = "profile/" + UUID.randomUUID().toString();
-                String dLPath = "drivingLicense/" + UUID.randomUUID().toString();
-                String aadhaarPath = "aadhaar/" + UUID.randomUUID().toString();
+
+                profilePath = "profile/" + UUID.randomUUID().toString();
+                if (!appClass.sharedPref.getProfilePath().isEmpty())
+                    profilePath = appClass.sharedPref.getProfilePath();
+
+                dLPath = "drivingLicense/" + UUID.randomUUID().toString();
+                if (!appClass.sharedPref.getDLPath().isEmpty())
+                    dLPath = appClass.sharedPref.getDLPath();
+
+                aadhaarPath = "aadhaar/" + UUID.randomUUID().toString();
+                if (!appClass.sharedPref.getAadhaarPath().isEmpty())
+                    aadhaarPath = appClass.sharedPref.getAadhaarPath();
+
                 StorageReference profileRef = rootRef.child(profilePath);
                 StorageReference dLRef = rootRef.child(dLPath);
                 StorageReference aadhaarRef = rootRef.child(aadhaarPath);
@@ -99,6 +109,7 @@ public class ProfileEditDetails extends Fragment {
                 if (name.isEmpty() && altMob.isEmpty() && fileAadhaarImage == null && fileProfileImage == null && fileDLImage == null) {
                     DialogCustoms.showSnackBar(getActivity(), "Enter details to edit.", binding.getRoot());
                     dialog.dismiss();
+                    binding.saveTV.setEnabled(true);
                     return;
                 }
 
@@ -108,6 +119,7 @@ public class ProfileEditDetails extends Fragment {
                         map.put("alternateMobile", altMob);
                     } else {
                         binding.altMobET.setError("Invalid");
+                        binding.saveTV.setEnabled(true);
                         dialog.dismiss();
                         return;
                     }
@@ -133,12 +145,9 @@ public class ProfileEditDetails extends Fragment {
                                     }
                                 }
                             });
-                } else
-                    dialog.dismiss();
+                }
 
                 if (fileAadhaarImage != null) {
-                    if(!dialog.isShowing())
-                        dialog.show();
                     aadhaarRef.putFile(Uri.fromFile(fileAadhaarImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -165,8 +174,6 @@ public class ProfileEditDetails extends Fragment {
                 }
 
                 if (fileProfileImage != null) {
-                    if(!dialog.isShowing())
-                        dialog.show();
                     profileRef.putFile(Uri.fromFile(fileProfileImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -193,8 +200,6 @@ public class ProfileEditDetails extends Fragment {
                 }
 
                 if (fileDLImage != null) {
-                    if(!dialog.isShowing())
-                        dialog.show();
                     dLRef.putFile(Uri.fromFile(fileDLImage)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -203,7 +208,6 @@ public class ProfileEditDetails extends Fragment {
                                     @Override
                                     public void onSuccess(Uri uri) {
                                         fileDLImage = null;
-                                        Log.d(TAG, "onComplete: success");
                                         saveImageUrl("drivingLicenseImg", uri, "drivingLicImgPath", dLPath);
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -357,7 +361,17 @@ public class ProfileEditDetails extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            appClass.sharedPref.setProfileUrl(uri.toString());
+                            if (key.matches("profileUrl")) {
+                                appClass.sharedPref.setProfileUrl(uri.toString());
+                                appClass.sharedPref.setProfilePath(imagePath);
+                            } else if (key.matches("aadhaarImgUrl")) {
+                                appClass.sharedPref.setAadhaarImg(uri.toString());
+                                appClass.sharedPref.setAadhaarPath(imagePath);
+                            } else if (key.matches("drivingLicenseImg")) {
+                                appClass.sharedPref.setDLImg(uri.toString());
+                                appClass.sharedPref.setDLPath(imagePath);
+                            }
+
                             dialog.dismiss();
                             if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)
                                 requireActivity().onBackPressed();
@@ -604,10 +618,5 @@ public class ProfileEditDetails extends Fragment {
             }
         }
         return true;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 }

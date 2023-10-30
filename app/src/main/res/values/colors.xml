@@ -7,4 +7,5 @@
     <color name="pastel_orange">#ff964f</color>
     <color name="gold">#dfbd2a</color>
     <color name="pastel_blue">#6392b0</color>
+    <color name="placeholder_bg">#ECECEC</color>
 </resources>

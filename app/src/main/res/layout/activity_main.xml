@@ -32,16 +32,16 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:weightSum="30"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:weightSum="30">
 
                         <LinearLayout
                             android:id="@+id/searchLL"
-                            android:layout_weight="29"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginVertical="4dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="29"
                             android:background="@drawable/search_border"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
@@ -61,21 +61,41 @@
 
                         <Button
                             android:id="@+id/addCashBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginEnd="4dp"
                             android:layout_weight="1"
                             android:backgroundTint="@color/gold"
-                            android:layout_marginEnd="4dp"
-                            android:layout_width="wrap_content"
-                            android:layout_gravity="end"
-                            android:layout_height="wrap_content"
                             android:text="Add Cash" />
                     </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRef"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:visibility="gone"
+                    android:id="@+id/shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#fff"
+                    android:elevation="1dp"
+                    app:duration="800">
+
+                    <include layout="@layout/placeholder_layout" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:visibility="visible"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
 
         <LinearLayout

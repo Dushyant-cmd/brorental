@@ -52,7 +52,7 @@ public class OtpActivity extends AppCompatActivity {
 
     //verificationId store verificationId returns from firebase auth when otp sent successfully
     private String mVerificationId;
-    private String name, pin, totalRide, totalRent, profileUrl, wallet;
+    private String name, pin, totalRide, totalRent, profileUrl, profileImgPath, wallet, aadhaarImgUrl, aadhaarImgPath, dLicenseImgUrl, dLicenseImgPath, status;
     private boolean termsCheck;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
@@ -379,6 +379,12 @@ public class OtpActivity extends AppCompatActivity {
                         finish();
                         dialog.dismiss();
                         sharedPreferences.setLogin(true);
+                        sharedPreferences.setAadhaarImg(d.getString("aadhaarImgUrl"));
+                        sharedPreferences.setAadhaarPath(d.getString("aadhaarImgPath"));
+                        sharedPreferences.setDLImg(d.getString("drivingLicenseImg"));
+                        sharedPreferences.setDLPath(d.getString("drivingLicImgPath"));
+                        sharedPreferences.setProfilePath(d.getString("profileImgPath"));
+                        sharedPreferences.setStatus(d.getString("status"));
                         sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"),
                                 d.getString("totalRent"),
                                 d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
@@ -390,7 +396,13 @@ public class OtpActivity extends AppCompatActivity {
                         totalRide = d.getString("totalRide");
                         termsCheck = d.getBoolean("termsCheck");
                         profileUrl = d.getString("profileUrl");
+                        profileImgPath = d.getString("profileImgPath");
                         wallet = d.getString("wallet");
+                        aadhaarImgUrl = d.getString("aadhaarImgUrl");
+                        aadhaarImgPath = d.getString("aadhaarImgPath");
+                        dLicenseImgUrl = d.getString("drivingLicenseImg");
+                        dLicenseImgPath = d.getString("drivingLicImgPath");
+                        status = d.getString("status");
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -419,7 +431,12 @@ public class OtpActivity extends AppCompatActivity {
                                                             map2.put("totalRides", "0");
                                                             map2.put("termsCheck", false);
                                                             map2.put("profileUrl", "");
-
+                                                            map2.put("profileImgPath", "");
+                                                            map2.put("aadhaarImgUrl", "");
+                                                            map2.put("aadhaarImgPath", "");
+                                                            map2.put("drivingLicenseImg", "");
+                                                            map2.put("drivingLicImgPath", "");
+                                                            map2.put("status", "pending");
                                                             mFirestore.collection("users")
                                                                     .document(pin).set(map2).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
@@ -431,6 +448,12 @@ public class OtpActivity extends AppCompatActivity {
                                                                             finish();
                                                                             dialog.dismiss();
                                                                             sharedPreferences.setLogin(true);
+                                                                            sharedPreferences.setAadhaarImg("");
+                                                                            sharedPreferences.setAadhaarPath("");
+                                                                            sharedPreferences.setDLImg("");
+                                                                            sharedPreferences.setDLPath("");
+                                                                            sharedPreferences.setProfilePath("");
+                                                                            sharedPreferences.setStatus("pending");
                                                                             sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, "", "0"));
                                                                             binding.otpLl.setVisibility(View.GONE);
                                                                             binding.otpLl.setVisibility(View.VISIBLE);

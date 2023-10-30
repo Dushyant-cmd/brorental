@@ -76,6 +76,54 @@ public class SharedPref {
         sharedPreferences.edit().putString("alternateMOb", mob).apply();
     }
 
+    public String getAadhaarImg() {
+        return sharedPreferences.getString("aadhaarImgUrl", "");
+    }
+
+    public void setAadhaarImg(String img) {
+        sharedPreferences.edit().putString("aadhaarImgUrl", img).apply();
+    }
+
+    public String getDLImg() {
+        return sharedPreferences.getString("dLicenseImg", "");
+    }
+
+    public void setDLImg(String img) {
+        sharedPreferences.edit().putString("dLicenseImg", img).apply();
+    }
+
+    public String getProfilePath() {
+        return sharedPreferences.getString("profileImgPath", "");
+    }
+
+    public void setProfilePath(String path) {
+        sharedPreferences.edit().putString("profileImgPath", path).apply();
+    }
+
+    public String getAadhaarPath() {
+        return sharedPreferences.getString("aadhaarImgPath", "");
+    }
+
+    public void setAadhaarPath(String path) {
+        sharedPreferences.edit().putString("aadhaarImgPath", path).apply();
+    }
+
+    public String getDLPath() {
+        return sharedPreferences.getString("dLicenseImgPath", "");
+    }
+
+    public void setDLPath(String path) {
+        sharedPreferences.edit().putString("dLicenseImgPath", path).apply();
+    }
+
+    public String getStatus() {
+        return sharedPreferences.getString("status", "");
+    }
+
+    public void setStatus(String status) {
+        sharedPreferences.edit().putString("status", status).apply();
+    }
+
     public void logout() {
         sharedPreferences.edit().clear().apply();
     }

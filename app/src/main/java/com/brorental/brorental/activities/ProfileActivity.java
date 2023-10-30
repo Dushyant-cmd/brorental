@@ -27,6 +27,8 @@ public class ProfileActivity extends AppCompatActivity {
         binding.altMobTV.setText("Alternate Mobile: " + appClass.sharedPref.getAlternateMob());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(binding.profileCirIV);
+        Glide.with(this).load(appClass.sharedPref.getAadhaarImg()).placeholder(R.drawable.profile_24).into(binding.aadharIV);
+        Glide.with(this).load(appClass.sharedPref.getDLImg()).placeholder(R.drawable.profile_24).into(binding.dLImgView);
         setListeners();
     }
 
