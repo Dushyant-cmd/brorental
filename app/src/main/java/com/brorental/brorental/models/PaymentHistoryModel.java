@@ -5,8 +5,8 @@ import java.util.Objects;
 public class PaymentHistoryModel {
     public String advertId, amount, broPartnerId, broRentalId, date, info, name, type, status, id;
     public boolean isBroRental;
-    public int timestamp;
-    public PaymentHistoryModel(String advertId, String amount, String broPartnerId, String broRentalId, String date, String info, String name, String type, String status, boolean isBroRental, int timestamp, String id) {
+    public long timestamp;
+    public PaymentHistoryModel(String advertId, String amount, String broPartnerId, String broRentalId, String date, String info, String name, String type, String status, boolean isBroRental, long timestamp, String id) {
         this.advertId = advertId;
         this.amount = amount;
         this.broPartnerId = broPartnerId;

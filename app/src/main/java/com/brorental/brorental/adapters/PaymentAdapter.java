@@ -39,11 +39,22 @@ public class PaymentAdapter extends ListAdapter<PaymentHistoryModel, PaymentAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        PaymentHistoryModel data = getItem(position);
+        if (data.type.matches("rent"))
+            holder.binding.TType.setText("Debit");
+        else if (data.type.matches("addCash"))
+            holder.binding.TType.setText("Credit");
+        else if (data.type.matches("ride"))
+            holder.binding.TType.setText("Debit");
 
+        holder.binding.TAmount.setText(data.amount);
+        holder.binding.TDate.setText(data.date);
+        holder.binding.TRemark.setText(data.type);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private PaymentHistoryListItemBinding binding;
+
         public ViewHolder(PaymentHistoryListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
