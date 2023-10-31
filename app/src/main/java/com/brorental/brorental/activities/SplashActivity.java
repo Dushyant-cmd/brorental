@@ -1,8 +1,10 @@
 package com.brorental.brorental.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -12,11 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
+import com.brorental.brorental.utilities.Utility;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,6 +37,7 @@ public class SplashActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(SplashActivity.this, R.layout.activity_splash);
         appClass = (AppClass) getApplication();
         setLocale("en");
+        Utility.registerConnectivityBR(SplashActivity.this, appClass);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

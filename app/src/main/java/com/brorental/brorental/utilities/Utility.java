@@ -2,11 +2,15 @@ package com.brorental.brorental.utilities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 
 public class Utility {
     private static String TAG = "Utility.java";
@@ -40,5 +44,11 @@ public class Utility {
         } catch (Exception e) {
             Log.d(TAG, "hideKeyboardFrom: " + e);
         }
+    }
+
+    public static void registerConnectivityBR(Context ctx, AppClass appClass) {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        ctx.registerReceiver(new ConnectionBroadcast(), intentFilter);
     }
 }

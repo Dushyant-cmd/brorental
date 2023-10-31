@@ -13,6 +13,7 @@ import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.adapters.SliderAdapter;
 import com.brorental.brorental.databinding.ActivityScreenSliderBinding;
+import com.brorental.brorental.utilities.Utility;
 
 public class ScreenSliderActivity extends AppCompatActivity {
 
@@ -27,6 +28,8 @@ public class ScreenSliderActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(ScreenSliderActivity.this, R.layout.activity_screen_slider);
         SliderAdapter adapter = new SliderAdapter(getSupportFragmentManager());
         application = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(ScreenSliderActivity.this, application);
         adapter.addTitle("welcome to brorental");
         adapter.addTitle("We will try our best to give you a better experience");
         adapter.addTitle("You can rent everything you need from Brorental at a low price nearby.");

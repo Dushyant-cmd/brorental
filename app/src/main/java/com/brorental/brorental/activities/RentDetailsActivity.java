@@ -22,6 +22,7 @@ import com.brorental.brorental.databinding.PaymentBottomSheetBinding;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.Utility;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -48,6 +49,8 @@ public class RentDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_rent_details);
         application = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(RentDetailsActivity.this, application);
         sharedPref = application.sharedPref;
         setSupportActionBar(binding.toolbar);
         getData();

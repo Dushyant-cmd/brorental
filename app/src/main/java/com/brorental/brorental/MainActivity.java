@@ -2,7 +2,9 @@ package com.brorental.brorental;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +35,9 @@ import com.brorental.brorental.activities.PaymentHistory;
 import com.brorental.brorental.activities.ProfileActivity;
 import com.brorental.brorental.activities.RideActivity;
 import com.brorental.brorental.activities.SignUpAndLogin;
+import com.brorental.brorental.activities.SplashActivity;
 import com.brorental.brorental.adapters.RentListAdapter;
+import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
 import com.brorental.brorental.models.RentItemModel;
@@ -88,11 +92,13 @@ public class MainActivity extends AppCompatActivity {
         binding.drawerLayout.addDrawerListener(mDrawerToggle);
 
         setListners();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(MainActivity.this, appClass);
         if(Utility.isNetworkAvailable(this)) {
             getData("", "");
         } else {
             Snackbar bar = Snackbar.make(binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
-            bar.setAction("connect", new View.OnClickListener() {
+            bar.setAction("Refresh", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(Utility.isNetworkAvailable(MainActivity.this)) {
@@ -108,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
             bar.show();
         }
+
         adapter = new RentListAdapter(this);
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerView.setAdapter(adapter);

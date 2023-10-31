@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -37,16 +38,15 @@ public class PaymentHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_payment_history);
         appClass = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(PaymentHistory.this, appClass);
         adapter = new PaymentAdapter(this);
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.walletTV.setText(appClass.sharedPref.getUser().getWallet());
 
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        setListners();
+
         if(Utility.isNetworkAvailable(this)) {
             getTransactions();
         } else {
@@ -66,14 +66,35 @@ public class PaymentHistory extends AppCompatActivity {
         }
     }
 
+    private void setListners() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        binding.swipeRef.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getTransactions();
+            }
+        });
+    }
+
     private void getTransactions() {
+        binding.shimmer.setVisibility(View.VISIBLE);
+        binding.recyclerView.setVisibility(View.GONE);
         appClass.firestore.collection("transactions").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        binding.swipeRef.setRefreshing(false);
+                        binding.shimmer.setVisibility(View.GONE);
+                        binding.recyclerView.setVisibility(View.VISIBLE);
                         try {
                             if(task.isSuccessful()) {
                                 List<DocumentSnapshot> dList = task.getResult().getDocuments();
+                                list.clear();
                                 for(int i=0; i<dList.size(); i++) {
                                     DocumentSnapshot d = dList.get(i);
                                     list.add(new PaymentHistoryModel(d.getString("advertisementId"), d.getString("amount"),

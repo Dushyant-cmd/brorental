@@ -11,7 +11,7 @@
     <item
         android:id="@+id/driving"
         android:icon="@drawable/baseline_directions_bike_24"
-        android:title="Start Driving"/>
+        android:title="Ride"/>
     <item
         android:id="@+id/history"
         android:icon="@drawable/baseline_history_24"

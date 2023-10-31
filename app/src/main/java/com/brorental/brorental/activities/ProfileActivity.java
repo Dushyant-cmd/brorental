@@ -10,6 +10,7 @@ import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityProfileBinding;
 import com.brorental.brorental.fragments.ProfileEditDetails;
 import com.brorental.brorental.utilities.AppClass;
+import com.brorental.brorental.utilities.Utility;
 import com.bumptech.glide.Glide;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -21,6 +22,8 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile);
         appClass = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(ProfileActivity.this, appClass);
         binding.nameTV.setText(appClass.sharedPref.getUser().getName());
         binding.pinTV.setText("Pin: " + appClass.sharedPref.getUser().getPin());
         binding.mobTV.setText("Mobile: " + appClass.sharedPref.getUser().getMobile());

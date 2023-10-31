@@ -23,7 +23,9 @@ import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityOtpBinding;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.User;
+import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.Utility;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -62,12 +64,14 @@ public class OtpActivity extends AppCompatActivity {
     FirebaseFirestore mFirestore;
     SharedPref sharedPreferences;
     private ActivityOtpBinding binding;
-
+    private AppClass appClass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_otp);
-
+        appClass = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(OtpActivity.this, appClass);
         mAuth = FirebaseAuth.getInstance();
         Intent i = getIntent();
         phone = "+91 " + i.getStringExtra("phone");

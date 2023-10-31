@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.RentItemModel;
+import com.brorental.brorental.utilities.AppClass;
+import com.brorental.brorental.utilities.Utility;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,11 +50,14 @@ public class PaymentActivity extends AppCompatActivity {
     private String TAG = "PaymentActivity.java";
     private JSONObject jsonData;
     private RentItemModel model;
-
+    private AppClass appClass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
+        appClass = (AppClass) getApplication();
+        //REGISTER BROADCAST RECEIVER FOR INTERNET
+        Utility.registerConnectivityBR(PaymentActivity.this, appClass);
         firestore = FirebaseFirestore.getInstance();
         sharedPreferences = new SharedPref(PaymentActivity.this);
         try {
@@ -262,6 +267,8 @@ public class PaymentActivity extends AppCompatActivity {
                                                 map2.put("broPartnerId", broPartnerId);
                                                 map2.put("status", "pending");
                                                 map2.put("totalHours", hours);
+                                                map2.put("category", model.getCategory());
+                                                map2.put("address", model.getAddress());
                                                 map2.put("perHourCharge", model.getPerHourCharge());
                                                 map2.put("paymentMode", "online");
                                                 map2.put("timestamp", System.currentTimeMillis());
@@ -270,8 +277,33 @@ public class PaymentActivity extends AppCompatActivity {
                                                             @Override
                                                             public void onComplete(@NonNull Task<DocumentReference> task) {
                                                                 if (task.isSuccessful()) {
-                                                                    Log.v(tag, "success");
-                                                                    Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                    appClass.firestore.collection("appData").document("balance")
+                                                                                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                    if(task.isSuccessful()) {
+                                                                                        DocumentSnapshot d = task.getResult();
+                                                                                        String prevAmt = d.getString("rentAmt");
+                                                                                        Long amt = Long.parseLong(prevAmt) + Long.parseLong(rechargeAmt);
+                                                                                        HashMap<String, Object> map = new HashMap<>();
+                                                                                        map.put("rentAmt", amt);
+                                                                                        firestore.collection("appData").document("balance")
+                                                                                                .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                        if(task.isSuccessful()) {
+                                                                                                            Log.v(tag, "success");
+                                                                                                            Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                        } else {
+                                                                                                            Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
+                                                                                    } else {
+                                                                                        Log.d(TAG, "onComplete: " + task.getException());
+                                                                                    }
+                                                                                }
+                                                                            });
                                                                 } else {
                                                                     Log.d(TAG, "onComplete: " + task.getException());
                                                                 }
