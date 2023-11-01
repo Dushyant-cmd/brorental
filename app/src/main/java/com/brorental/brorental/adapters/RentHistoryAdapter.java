@@ -56,6 +56,7 @@ public class RentHistoryAdapter extends ListAdapter<HistoryModel, RentHistoryAda
         holder.binding.extraHourCh.setText("\u20B9 Extra charge per hour");
         holder.binding.payStatus.setText("Payment Completed " + data.paymentMode);
         holder.binding.advertId.setText("Advertisement Id: " + data.advertisementId);
+        holder.binding.statusTV.setText("Status: " + data.status);
 
         holder.binding.callOwnerBtn.setOnClickListener(new View.OnClickListener() {
             @Override

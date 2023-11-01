@@ -82,7 +82,7 @@ public class RentDetailsActivity extends AppCompatActivity {
 
             String perHourCharge = data.getString("perHourCharge");
             String extraCharge = data.getString("extraCharge");
-            binding.advertId.setText("Ads Id: " + data.getString("id"));
+            binding.advertId.setText("Ads Id: " + data.getString("advertisementId"));
             binding.amountTV.setText("\u20B9 " + perHourCharge);
             binding.nameTV.setText(data.getString("name"));
             binding.ownerDesc.setText(data.getString("ownerDescription"));
@@ -102,7 +102,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                         if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
                             DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
                         } else {
-                            PayBottomSheet sheet = new PayBottomSheet(data.getString("id"), perHourCharge, extraCharge, data);
+                            PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data);
                             sheet.show(getSupportFragmentManager(), PayBottomSheet.TAG);
                         }
                     } catch (Exception e) {

@@ -285,8 +285,8 @@ public class PaymentActivity extends AppCompatActivity {
                                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                                     if(task.isSuccessful()) {
                                                                                         DocumentSnapshot d = task.getResult();
-                                                                                        String prevAmt = d.getString("rentAmt");
-                                                                                        Long amt = Long.parseLong(prevAmt) + Long.parseLong(rechargeAmt);
+                                                                                        long prevAmt = d.getLong("rentAmt");
+                                                                                        long amt = prevAmt + Long.parseLong(rechargeAmt);
                                                                                         HashMap<String, Object> map = new HashMap<>();
                                                                                         map.put("rentAmt", amt);
                                                                                         firestore.collection("appData").document("balance")

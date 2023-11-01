@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,16 +41,29 @@ public class RentHistoryFragment extends Fragment {
         adapter = new RentHistoryAdapter(requireActivity());
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
+
+        binding.swipeRef.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getRentItems();
+            }
+        });
         getRentItems();
         return binding.getRoot();
     }
 
     private void getRentItems() {
+        binding.shimmer.setVisibility(View.VISIBLE);
+        binding.recyclerView.setVisibility(View.GONE);
         appClass.firestore.collection("rentHistory").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        binding.swipeRef.setRefreshing(false);
+                        binding.shimmer.setVisibility(View.GONE);
+                        binding.recyclerView.setVisibility(View.VISIBLE);
                         if(task.isSuccessful()) {
+                            list.clear();
                             for(DocumentSnapshot d: task.getResult().getDocuments()) {
                                 HistoryModel model = d.toObject(HistoryModel.class);
                                 list.add(model);
