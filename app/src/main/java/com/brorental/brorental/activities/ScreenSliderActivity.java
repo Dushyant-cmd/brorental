@@ -30,9 +30,9 @@ public class ScreenSliderActivity extends AppCompatActivity {
         application = (AppClass) getApplication();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(ScreenSliderActivity.this, application);
-        adapter.addTitle("welcome to brorental");
+        adapter.addTitle("welcome to BroRental");
         adapter.addTitle("We will try our best to give you a better experience");
-        adapter.addTitle("You can rent everything you need from Brorental at a low price nearby.");
+        adapter.addTitle("You can rent everything you need from BroRental at a low price nearby.");
         binding.viewPager.setAdapter(adapter);
         binding.dotsIndicator.attachTo(binding.viewPager);
         setListeners();
