@@ -257,7 +257,7 @@ public class PaymentActivity extends AppCompatActivity {
                                                 HashMap<String, Object> map2 = new HashMap<>();
                                                 map2.put("rentImages", model.getAdsImageUrl());
                                                 map2.put("name", model.getName());
-                                                map2.put("advertisementId", model.getId());
+                                                map2.put("advertisementId", model.getAdvertisementId());
                                                 map2.put("totalRentCost", rechargeAmt);
                                                 map2.put("extraCharge", model.getExtraCharge());
                                                 map2.put("id", UUID.randomUUID().toString());
@@ -272,6 +272,8 @@ public class PaymentActivity extends AppCompatActivity {
                                                 map2.put("perHourCharge", model.getPerHourCharge());
                                                 map2.put("paymentMode", "online");
                                                 map2.put("timestamp", System.currentTimeMillis());
+                                                map2.put("broPartnerMobile", model.getBroPartnerMobile());
+                                                map2.put("broRentalMobile", sharedPreferences.getUser().getMobile());
                                                 firestore.collection("rentHistory").add(map2)
                                                         .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                                             @Override

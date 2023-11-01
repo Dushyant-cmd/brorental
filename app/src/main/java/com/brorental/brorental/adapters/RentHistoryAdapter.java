@@ -1,7 +1,10 @@
 package com.brorental.brorental.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -53,6 +56,15 @@ public class RentHistoryAdapter extends ListAdapter<HistoryModel, RentHistoryAda
         holder.binding.extraHourCh.setText("\u20B9 Extra charge per hour");
         holder.binding.payStatus.setText("Payment Completed " + data.paymentMode);
         holder.binding.advertId.setText("Advertisement Id: " + data.advertisementId);
+
+        holder.binding.callOwnerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_DIAL);
+                i.setData(Uri.parse("tel:" + data.broPartnerMobile));
+                context.startActivity(i);
+            }
+        });
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

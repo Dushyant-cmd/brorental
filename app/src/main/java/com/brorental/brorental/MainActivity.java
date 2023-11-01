@@ -264,13 +264,15 @@ public class MainActivity extends AppCompatActivity {
                             List<DocumentSnapshot> docList = task.getResult().getDocuments();
                             for(int i=0; i<docList.size(); i++) {
                                 DocumentSnapshot d = docList.get(i);
-                                list.add(new RentItemModel(d.getString("advertisementId"), d.getString("address"),
-                                        d.getString("adsImageUrl"), d.getString("broPartnerId"),
-                                        d.getString("category"), d.getString("docId"), d.getString("extraCharge"),
-                                        d.getString("ownerDescription"), d.getString("perHourCharge"), d.getString("state"),
-                                        d.getString("status"), d.getString("vehicleNumber"), d.getString("timings"),
-                                        d.getString("year"), d.getString("productHealth"), d.getString("productColor"),
-                                        d.getString("name")));
+                                RentItemModel model = d.toObject(RentItemModel.class);
+                                list.add(model);
+//                                list.add(new RentItemModel(d.getString("advertisementId"), d.getString("address"),
+//                                        d.getString("adsImageUrl"), d.getString("broPartnerId"),
+//                                        d.getString("category"), d.getString("docId"), d.getString("extraCharge"),
+//                                        d.getString("ownerDescription"), d.getString("perHourCharge"), d.getString("state"),
+//                                        d.getString("status"), d.getString("vehicleNumber"), d.getString("timings"),
+//                                        d.getString("year"), d.getString("productHealth"), d.getString("productColor"),
+//                                        d.getString("name")));
                             }
 
                             adapter.notifyDataSetChanged();

@@ -3,13 +3,14 @@ package com.brorental.brorental.models;
 import java.util.Objects;
 
 public class HistoryModel {
-    public String advertisementId, broPartnerId, broRentalId, extraCharge, id, name, paymentMode, perHourCharge, rentEndTime, rentImages, rentStartTime, status, totalHours, totalRentCost, category, address;
+    public String advertisementId, broPartnerId, broRentalId, extraCharge, id, name, paymentMode, perHourCharge, rentEndTime, rentImages, rentStartTime, status, totalHours, totalRentCost, category, address, broPartnerMobile, broRentalMobile;
     long timestamp;
 
     public HistoryModel() {
         //mandatory if you deserializing
     }
-    public HistoryModel(String advertisementId, String broPartnerId, String broRentalId, String extraCharge, String id, String name, String paymentMode, String perHourCharge, String rentEndTime, String rentImages, String rentStartTime, String status, String totalHours, String totalRentCost, long timestamp) {
+
+    public HistoryModel(String advertisementId, String broPartnerId, String broRentalId, String extraCharge, String id, String name, String paymentMode, String perHourCharge, String rentEndTime, String rentImages, String rentStartTime, String status, String totalHours, String totalRentCost, String category, String address, String broPartnerMobile, String broRentalMobile, long timestamp) {
         this.advertisementId = advertisementId;
         this.broPartnerId = broPartnerId;
         this.broRentalId = broRentalId;
@@ -24,6 +25,10 @@ public class HistoryModel {
         this.status = status;
         this.totalHours = totalHours;
         this.totalRentCost = totalRentCost;
+        this.category = category;
+        this.address = address;
+        this.broPartnerMobile = broPartnerMobile;
+        this.broRentalMobile = broRentalMobile;
         this.timestamp = timestamp;
     }
 

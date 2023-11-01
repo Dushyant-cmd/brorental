@@ -30,8 +30,8 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
         super(new DiffUtil.ItemCallback<RentItemModel>() {
             @Override
             public boolean areItemsTheSame(@NonNull RentItemModel oldItem, @NonNull RentItemModel newItem) {
-                Log.d("RentListAdapter.java", "areItemsTheSame: " + oldItem.id.equals(newItem.id));
-                return oldItem.id.equals(newItem.id);
+                Log.d("RentListAdapter.java", "areItemsTheSame: " + oldItem.advertisementId.equals(newItem.advertisementId));
+                return oldItem.advertisementId.equals(newItem.advertisementId);
             }
 
             @Override

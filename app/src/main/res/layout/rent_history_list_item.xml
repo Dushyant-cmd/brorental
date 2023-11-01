@@ -46,17 +46,6 @@
 
                     </FrameLayout>
 
-                    <Button
-                        android:id="@+id/viewDetailsBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/black"
-                        android:text="View"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
                     <androidx.cardview.widget.CardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -96,7 +85,7 @@
                         android:theme="@style/textStyle" />
 
                     <TextView
-                        android:id="@+id/pin"
+                        android:id="@+id/advertId"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -156,7 +145,7 @@
                         android:theme="@style/textStyle" />
 
                     <TextView
-                        android:id="@+id/advertId"
+                        android:id="@+id/pin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -171,6 +160,13 @@
 
                 </LinearLayout>
 
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Call Owner"
+                    android:layout_marginHorizontal="@dimen/_8dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:id="@+id/callOwnerBtn"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

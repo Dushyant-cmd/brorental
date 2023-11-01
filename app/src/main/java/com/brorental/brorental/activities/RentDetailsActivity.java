@@ -43,7 +43,6 @@ public class RentDetailsActivity extends AppCompatActivity {
     private String TAG = "RentDetailsActivity.java";
     private AppClass application;
     private SharedPref sharedPref;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
