@@ -85,7 +85,7 @@ public class SearchFragment extends Fragment {
                 if (cateArr != null && !newText.isEmpty()) {
                     hintList.clear();
                     for (int i = 0; i < cateArr.length; i++) {
-                        if (cateArr[i].toLowerCase().contains(newText)) {
+                        if (cateArr[i].toLowerCase().contains(newText.trim())) {
                             hintList.add(cateArr[i]);
                         }
                     }
