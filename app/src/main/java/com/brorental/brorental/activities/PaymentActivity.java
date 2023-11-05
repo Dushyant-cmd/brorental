@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
+import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
@@ -52,9 +53,6 @@ public class PaymentActivity extends AppCompatActivity {
     private JSONObject jsonData;
     private RentItemModel model;
     private AppClass appClass;
-    public PaymentActivity(Context parentAct) {
-
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

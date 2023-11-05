@@ -128,12 +128,14 @@ public class ProfileEditDetails extends Fragment {
                     }
                 }
 
-                if(!email.isEmpty()) {
+                if (!email.isEmpty()) {
                     Pattern pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
                     Matcher matcher = pattern.matcher(email);
-                    if(matcher.matches()) {
+                    if (matcher.matches()) {
                         map.put("email", email);
                     } else {
+                        dialog.dismiss();
+                        binding.saveTV.setEnabled(true);
                         binding.emailEt.setError("Invalid");
                         binding.emailEt.requestFocus();
                         return;
@@ -150,11 +152,11 @@ public class ProfileEditDetails extends Fragment {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         dialog.dismiss();
-                                        if(!altMob.isEmpty())
-                                        appClass.sharedPref.setAlternateMob(altMob);
-                                        if(!name.isEmpty())
+                                        if (!altMob.isEmpty())
+                                            appClass.sharedPref.setAlternateMob(altMob);
+                                        if (!name.isEmpty())
                                             appClass.sharedPref.setName(name);
-                                        if(!email.isEmpty())
+                                        if (!email.isEmpty())
                                             appClass.sharedPref.setEmail(email);
                                         Log.d(TAG, "onComplete: success");
                                         if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)

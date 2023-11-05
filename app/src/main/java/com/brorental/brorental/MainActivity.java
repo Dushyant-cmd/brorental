@@ -41,6 +41,7 @@ import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
+import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
@@ -66,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<RentItemModel> list = new ArrayList<>();
     private FirebaseFirestore mFirestore;
     private AppClass appClass;
-    private TextView walletTV, viewProfileTV, nameTV;
-    private ImageView imageView;
-    private LinearLayout walletLL;
+    private TextView headerWalletTV, viewProfileTV, headerNameTV;
+    private ImageView headerImageView;
+    private LinearLayout headerWalletLL;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,15 +97,15 @@ public class MainActivity extends AppCompatActivity {
 
         //header listeners and dynamic text.
         View headerView = binding.navigationView.getHeaderView(0);
-        walletTV = headerView.findViewById(R.id.walletTV);
-        imageView = headerView.findViewById(R.id.profileIV);
+        headerWalletTV = headerView.findViewById(R.id.walletTV);
+        headerImageView = headerView.findViewById(R.id.profileIV);
         viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
-        nameTV = headerView.findViewById(R.id.nameTV);
-        walletLL = headerView.findViewById(R.id.walletLL);
-        walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
-        nameTV.setText(appClass.sharedPref.getUser().getName());
+        headerNameTV = headerView.findViewById(R.id.nameTV);
+        headerWalletLL = headerView.findViewById(R.id.walletLL);
+        headerWalletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
+        headerNameTV.setText(appClass.sharedPref.getUser().getName());
 
-        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
 
         setListeners();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
@@ -179,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent i = new Intent(MainActivity.this, PaymentActivity.class);
                         i.putExtra("addCash", true);
                         i.putExtra("amt", rechargeET.getText().toString());
-                        startActivity(i);
+                        startActivityForResult(i, 101);
                         sheet.dismiss();
                     }
                 });
@@ -281,13 +282,6 @@ public class MainActivity extends AppCompatActivity {
                                 DocumentSnapshot d = docList.get(i);
                                 RentItemModel model = d.toObject(RentItemModel.class);
                                 list.add(model);
-//                                list.add(new RentItemModel(d.getString("advertisementId"), d.getString("address"),
-//                                        d.getString("adsImageUrl"), d.getString("broPartnerId"),
-//                                        d.getString("category"), d.getString("docId"), d.getString("extraCharge"),
-//                                        d.getString("ownerDescription"), d.getString("perHourCharge"), d.getString("state"),
-//                                        d.getString("status"), d.getString("vehicleNumber"), d.getString("timings"),
-//                                        d.getString("year"), d.getString("productHealth"), d.getString("productColor"),
-//                                        d.getString("name")));
                             }
 
                             adapter.notifyDataSetChanged();
@@ -308,10 +302,21 @@ public class MainActivity extends AppCompatActivity {
         fT.commit();
     }
 
-    /**Below method will refresh all data. */
-    public void refresh() {
-        walletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
-        nameTV.setText(appClass.sharedPref.getUser().getName());
-        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
+    @Override
+    public void onActivityResult(int reqCode, int resCode, Intent intent) {
+        super.onActivityResult(reqCode, resCode, intent);
+        Log.d(TAG, "onActivityResult: 44");
+        if(resCode == RESULT_OK) {
+            switch (reqCode) {
+                case 101:
+                    Log.d(TAG, "onActivityResult: kjhkj");
+                    headerWalletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
+                    headerNameTV.setText(appClass.sharedPref.getUser().getName());
+                    Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
