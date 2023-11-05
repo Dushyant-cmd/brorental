@@ -13,7 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 
 public class Utility {
-    private static String TAG = "Utility.java";
+    public static String TAG = "Utility.java", rupeeIcon = "\u20B9";
     //To check connectivity with network
     public static boolean isNetworkAvailable(Context ctx) {
         try {

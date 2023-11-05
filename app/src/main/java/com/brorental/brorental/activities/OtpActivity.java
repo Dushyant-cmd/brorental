@@ -54,7 +54,7 @@ public class OtpActivity extends AppCompatActivity {
 
     //verificationId store verificationId returns from firebase auth when otp sent successfully
     private String mVerificationId;
-    private String name, pin, totalRide, totalRent, profileUrl, profileImgPath, wallet, aadhaarImgUrl, aadhaarImgPath, dLicenseImgUrl, dLicenseImgPath, status;
+    private String name, pin, totalRide, totalRent, profileUrl, profileImgPath, wallet, aadhaarImgUrl, aadhaarImgPath, dLicenseImgUrl, dLicenseImgPath, status, email;
     private boolean termsCheck;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
@@ -65,6 +65,7 @@ public class OtpActivity extends AppCompatActivity {
     SharedPref sharedPreferences;
     private ActivityOtpBinding binding;
     private AppClass appClass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +150,13 @@ public class OtpActivity extends AppCompatActivity {
                                         startActivity(i);
                                         finish();
                                         sharedPreferences.setLogin(true);
+                                        sharedPreferences.setAadhaarImg(aadhaarImgUrl);
+                                        sharedPreferences.setAadhaarPath(aadhaarImgPath);
+                                        sharedPreferences.setDLImg(dLicenseImgUrl);
+                                        sharedPreferences.setDLPath(dLicenseImgPath);
+                                        sharedPreferences.setProfilePath(profileImgPath);
+                                        sharedPreferences.setStatus(status);
+                                        sharedPreferences.setEmail(email);
                                         sharedPreferences.saveUser(new User(name, phone, pin, totalRent,
                                                 totalRide, true, profileUrl, wallet));
                                         Log.d(TAG, "onComplete: " + task.getResult());
@@ -389,6 +397,7 @@ public class OtpActivity extends AppCompatActivity {
                         sharedPreferences.setDLPath(d.getString("drivingLicImgPath"));
                         sharedPreferences.setProfilePath(d.getString("profileImgPath"));
                         sharedPreferences.setStatus(d.getString("status"));
+                        sharedPreferences.setEmail(d.getString("email"));
                         sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"),
                                 d.getString("totalRent"),
                                 d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
@@ -407,6 +416,7 @@ public class OtpActivity extends AppCompatActivity {
                         dLicenseImgUrl = d.getString("drivingLicenseImg");
                         dLicenseImgPath = d.getString("drivingLicImgPath");
                         status = d.getString("status");
+                        email = d.getString("email");
                         binding.otpLl.setVisibility(View.GONE);
                         binding.termsLangLL.setVisibility(View.VISIBLE);
                     }
@@ -458,6 +468,7 @@ public class OtpActivity extends AppCompatActivity {
                                                                             sharedPreferences.setDLPath("");
                                                                             sharedPreferences.setProfilePath("");
                                                                             sharedPreferences.setStatus("pending");
+                                                                            sharedPreferences.setEmail("");
                                                                             sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, "", "0"));
                                                                             binding.otpLl.setVisibility(View.GONE);
                                                                             binding.otpLl.setVisibility(View.VISIBLE);

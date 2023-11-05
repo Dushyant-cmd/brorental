@@ -50,6 +50,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProfileEditDetails extends Fragment {
     private FragmentProfileDetailsBinding binding;
@@ -105,6 +107,7 @@ public class ProfileEditDetails extends Fragment {
                 StorageReference aadhaarRef = rootRef.child(aadhaarPath);
                 String name = binding.nameET.getText().toString();
                 String altMob = binding.altMobET.getText().toString();
+                String email = binding.emailEt.getText().toString();
 
                 if (name.isEmpty() && altMob.isEmpty() && fileAadhaarImage == null && fileProfileImage == null && fileDLImage == null) {
                     DialogCustoms.showSnackBar(getActivity(), "Enter details to edit.", binding.getRoot());
@@ -125,6 +128,18 @@ public class ProfileEditDetails extends Fragment {
                     }
                 }
 
+                if(!email.isEmpty()) {
+                    Pattern pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+                    Matcher matcher = pattern.matcher(email);
+                    if(matcher.matches()) {
+                        map.put("email", email);
+                    } else {
+                        binding.emailEt.setError("Invalid");
+                        binding.emailEt.requestFocus();
+                        return;
+                    }
+                }
+
                 if (!name.isEmpty())
                     map.put("name", name);
 
@@ -135,7 +150,12 @@ public class ProfileEditDetails extends Fragment {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         dialog.dismiss();
+                                        if(!altMob.isEmpty())
                                         appClass.sharedPref.setAlternateMob(altMob);
+                                        if(!name.isEmpty())
+                                            appClass.sharedPref.setName(name);
+                                        if(!email.isEmpty())
+                                            appClass.sharedPref.setEmail(email);
                                         Log.d(TAG, "onComplete: success");
                                         if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)
                                             getActivity().onBackPressed();

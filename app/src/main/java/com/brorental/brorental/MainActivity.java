@@ -1,5 +1,6 @@
 package com.brorental.brorental;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -65,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<RentItemModel> list = new ArrayList<>();
     private FirebaseFirestore mFirestore;
     private AppClass appClass;
-
+    private TextView walletTV, viewProfileTV, nameTV;
+    private ImageView imageView;
+    private LinearLayout walletLL;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +94,19 @@ public class MainActivity extends AppCompatActivity {
 
         binding.drawerLayout.addDrawerListener(mDrawerToggle);
 
-        setListners();
+        //header listeners and dynamic text.
+        View headerView = binding.navigationView.getHeaderView(0);
+        walletTV = headerView.findViewById(R.id.walletTV);
+        imageView = headerView.findViewById(R.id.profileIV);
+        viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
+        nameTV = headerView.findViewById(R.id.nameTV);
+        walletLL = headerView.findViewById(R.id.walletLL);
+        walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
+        nameTV.setText(appClass.sharedPref.getUser().getName());
+
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
+
+        setListeners();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(MainActivity.this, appClass);
         if(Utility.isNetworkAvailable(this)) {
@@ -121,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.submitList(list);
     }
 
-    private void setListners() {
+    private void setListeners() {
         //header listeners and dynamic text.
         View headerView = binding.navigationView.getHeaderView(0);
         TextView walletTV = headerView.findViewById(R.id.walletTV);
@@ -291,5 +306,12 @@ public class MainActivity extends AppCompatActivity {
         fT.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         fT.addToBackStack(null);
         fT.commit();
+    }
+
+    /**Below method will refresh all data. */
+    public void refresh() {
+        walletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
+        nameTV.setText(appClass.sharedPref.getUser().getName());
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
     }
 }
