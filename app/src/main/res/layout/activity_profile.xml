@@ -20,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:id="@+id/text_img_ll"
                 tools:context=".activities.ProfileActivity">
 
                 <androidx.appcompat.widget.Toolbar
@@ -245,6 +246,21 @@
                 </RelativeLayout>
             </LinearLayout>
 
+            <TextView
+                android:layout_below="@id/text_img_ll"
+                android:padding="@dimen/_8dp"
+                android:background="@drawable/dotted_border_card_white"
+                android:drawablePadding="@dimen/_8dp"
+                android:fontFamily="@font/monserrat_semibold"
+                android:layout_marginVertical="@dimen/_15dp"
+                android:layout_marginHorizontal="@dimen/_8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/baseline_login_24"
+                android:text="Log-out"
+                android:id="@+id/logout_tv"
+                android:textSize="16sp"
+                android:theme="@style/textStyle"/>
             <FrameLayout
                 android:background="@color/white"
                 android:layout_width="match_parent"

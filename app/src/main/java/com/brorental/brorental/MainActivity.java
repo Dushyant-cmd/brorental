@@ -1,11 +1,8 @@
 package com.brorental.brorental;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,12 +33,9 @@ import com.brorental.brorental.activities.PaymentHistory;
 import com.brorental.brorental.activities.ProfileActivity;
 import com.brorental.brorental.activities.RideActivity;
 import com.brorental.brorental.activities.SignUpAndLogin;
-import com.brorental.brorental.activities.SplashActivity;
 import com.brorental.brorental.adapters.RentListAdapter;
-import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
-import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
@@ -70,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView headerWalletTV, viewProfileTV, headerNameTV;
     private ImageView headerImageView;
     private LinearLayout headerWalletLL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,14 +105,14 @@ public class MainActivity extends AppCompatActivity {
         setListeners();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(MainActivity.this, appClass);
-        if(Utility.isNetworkAvailable(this)) {
+        if (Utility.isNetworkAvailable(this)) {
             getData("", "");
         } else {
             Snackbar bar = Snackbar.make(binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
             bar.setAction("Refresh", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(Utility.isNetworkAvailable(MainActivity.this)) {
+                    if (Utility.isNetworkAvailable(MainActivity.this)) {
                         getData("", "");
                         bar.dismiss();
                         Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
@@ -153,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, ProfileActivity.class);
-                startActivity(i);
+                startActivityForRes(i);
             }
         });
 
@@ -161,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, ProfileActivity.class);
-                startActivity(i);
+                startActivityForRes(i);
             }
         });
 
@@ -180,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent i = new Intent(MainActivity.this, PaymentActivity.class);
                         i.putExtra("addCash", true);
                         i.putExtra("amt", rechargeET.getText().toString());
-                        startActivityForResult(i, 101);
+                        startActivityForRes(i);
                         sheet.dismiss();
                     }
                 });
@@ -212,41 +207,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                if(id == R.id.profile) {
+                if (id == R.id.profile) {
                     Intent i = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(i);
-                } else if(id == R.id.rent) {
+                } else if (id == R.id.rent) {
                     binding.drawerLayout.close();
-                } else if(id == R.id.driving) {
+                } else if (id == R.id.driving) {
                     Intent i = new Intent(MainActivity.this, RideActivity.class);
                     startActivity(i);
-                } else if(id == R.id.history) {
+                } else if (id == R.id.history) {
                     Intent i = new Intent(MainActivity.this, HistoryActivity.class);
                     startActivity(i);
-                } else if(id == R.id.termsCon) {
+                } else if (id == R.id.termsCon) {
                     DialogCustoms.showSnackBar(MainActivity.this, "Terms & Conditions", binding.getRoot());
-                } else if(id == R.id.logout) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("Are you sure to log-out");
-                    builder.setPositiveButton("Log-out", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent(MainActivity.this, SignUpAndLogin.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                            finish();
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    builder.create().show();
                 }
+
                 return true;
             }
         });
@@ -264,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         Query query = mFirestore.collection("rent").limit(10);
-        if(!selectedState.isEmpty()) {
+        if (!selectedState.isEmpty()) {
             query = mFirestore.collection("rent").whereEqualTo("state", selectedState)
                     .whereEqualTo("category", category).limit(10);
         }
@@ -275,10 +250,10 @@ public class MainActivity extends AppCompatActivity {
                         binding.swipeRef.setRefreshing(false);
                         binding.shimmer.setVisibility(View.GONE);
                         binding.recyclerView.setVisibility(View.VISIBLE);
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             list.clear();
                             List<DocumentSnapshot> docList = task.getResult().getDocuments();
-                            for(int i=0; i<docList.size(); i++) {
+                            for (int i = 0; i < docList.size(); i++) {
                                 DocumentSnapshot d = docList.get(i);
                                 RentItemModel model = d.toObject(RentItemModel.class);
                                 list.add(model);
@@ -306,17 +281,19 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int reqCode, int resCode, Intent intent) {
         super.onActivityResult(reqCode, resCode, intent);
         Log.d(TAG, "onActivityResult: 44");
-        if(resCode == RESULT_OK) {
-            switch (reqCode) {
-                case 101:
-                    Log.d(TAG, "onActivityResult: kjhkj");
-                    headerWalletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
-                    headerNameTV.setText(appClass.sharedPref.getUser().getName());
-                    Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
-                    break;
-                default:
-                    break;
-            }
+        switch (reqCode) {
+            case 101:
+                headerWalletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
+                headerNameTV.setText(appClass.sharedPref.getUser().getName());
+                Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
+                break;
+            default:
+                break;
         }
+    }
+
+    public void startActivityForRes(Intent i) {
+        if (!isFinishing())
+            startActivityForResult(i, 101);
     }
 }

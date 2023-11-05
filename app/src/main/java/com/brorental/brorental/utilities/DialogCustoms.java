@@ -2,8 +2,10 @@ package com.brorental.brorental.utilities;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,11 @@ public class DialogCustoms {
     public static void showSnackBar(Context ctx, String msg, View root) {
         try {
             Snackbar bar = Snackbar.make(root, msg, Snackbar.LENGTH_SHORT);
+            bar.setAction("Contact-Us", view -> {
+                Intent i = new Intent(Intent.ACTION_DIAL);
+                i.setData(Uri.parse("tel:" + "+919773602742"));
+                ctx.startActivity(i);
+            });
             bar.show();
         } catch (Exception e) {
             Log.d(TAG, "showSnackBar: " + e);

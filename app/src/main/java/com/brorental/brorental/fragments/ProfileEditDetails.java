@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment;
 
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.FragmentProfileDetailsBinding;
+import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -61,6 +62,11 @@ public class ProfileEditDetails extends Fragment {
     private File fileAadhaarImage, fileDLImage, fileProfileImage;
     private String currentPhotoPath, profilePath, dLPath, aadhaarPath;
     private ProgressDialog dialog;
+    private UtilsInterface.RefreshInterface refreshInterface;
+    private boolean isKyc = false;
+    public ProfileEditDetails(UtilsInterface.RefreshInterface refreshInterface) {
+        this.refreshInterface = refreshInterface;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +75,7 @@ public class ProfileEditDetails extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile_details, container, false);
         appClass = (AppClass) getActivity().getApplication();
         dialog = new ProgressDialog(getActivity());
+        dialog.setCancelable(false);
         setListeners();
         return binding.getRoot();
     }
@@ -109,7 +116,7 @@ public class ProfileEditDetails extends Fragment {
                 String altMob = binding.altMobET.getText().toString();
                 String email = binding.emailEt.getText().toString();
 
-                if (name.isEmpty() && altMob.isEmpty() && fileAadhaarImage == null && fileProfileImage == null && fileDLImage == null) {
+                if (name.isEmpty() && altMob.isEmpty() && fileAadhaarImage == null && fileProfileImage == null && fileDLImage == null && email.isEmpty()) {
                     DialogCustoms.showSnackBar(getActivity(), "Enter details to edit.", binding.getRoot());
                     dialog.dismiss();
                     binding.saveTV.setEnabled(true);
@@ -640,5 +647,30 @@ public class ProfileEditDetails extends Fragment {
             }
         }
         return true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        refreshInterface.refresh(0);
+        if (!appClass.sharedPref.getEmail().isEmpty() && !appClass.sharedPref.getAlternateMob().isEmpty() && appClass.sharedPref.getAadhaarImg() != null && appClass.sharedPref.getUser().getProfileUrl() != null && appClass.sharedPref.getDLImg() != null) {
+            if(appClass.sharedPref.getStatus().matches("pending")) {
+                appClass.sharedPref.setStatus("approved");
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("status", "approved");
+                appClass.firestore.collection("users")
+                        .document(appClass.sharedPref.getUser().getPin())
+                        .update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d(TAG, "onSuccess: success");
+                            }
+                        });
+            }
+        }
     }
 }

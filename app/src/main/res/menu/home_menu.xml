@@ -20,8 +20,8 @@
         android:id="@+id/termsCon"
         android:icon="@drawable/baseline_policy_24"
         android:title="Terms &amp; Conditions"/>
-    <item
-        android:id="@+id/logout"
-        android:icon="@drawable/baseline_login_24"
-        android:title="Log-out"/>
+<!--    <item-->
+<!--        android:id="@+id/logout"-->
+<!--        android:icon="@drawable/baseline_login_24"-->
+<!--        android:title="Log-out"/>-->
 </menu>

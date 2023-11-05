@@ -27,6 +27,7 @@ import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
@@ -43,6 +44,7 @@ public class RentDetailsActivity extends AppCompatActivity {
     private String TAG = "RentDetailsActivity.java";
     private AppClass application;
     private SharedPref sharedPref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +101,10 @@ public class RentDetailsActivity extends AppCompatActivity {
                     //Display a bottom sheet to select from - to and total cost, extra charge,
                     //terms & conditions with a complete payment button.
                     try {
+                        if (sharedPref.getStatus().matches("pending")) {
+                            DialogCustoms.showSnackBar(RentDetailsActivity.this, "KYC not completed", binding.getRoot());
+                            return;
+                        }
                         if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
                             DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
                         } else {
@@ -139,9 +145,9 @@ public class RentDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     try {
-                        if (binding.totalAmtV.getText().toString().matches("\u20B9 0")) {
+                        if (binding.totalAmtV.getText().toString().matches("\u20B9 0"))
                             DialogCustoms.showSnackBar(getActivity(), "Minimum rent for 1 hour", binding.getRoot());
-                        } else if (fromDate.isEmpty() && toDate.isEmpty())
+                        else if (fromDate.isEmpty() && toDate.isEmpty())
                             DialogCustoms.showSnackBar(getActivity(), "Please select date", binding.getRoot());
                         else {
                             Intent i = new Intent(getActivity(), PaymentActivity.class);

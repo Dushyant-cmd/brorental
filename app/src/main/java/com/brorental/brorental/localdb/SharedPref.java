@@ -86,7 +86,7 @@ public class SharedPref {
     }
 
     public void setAlternateMob(String mob) {
-        sharedPreferences.edit().putString("alternateMOb", mob).apply();
+        sharedPreferences.edit().putString("alternateMob", mob).apply();
     }
 
     public String getAadhaarImg() {

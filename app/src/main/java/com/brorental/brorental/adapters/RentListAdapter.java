@@ -1,5 +1,6 @@
 package com.brorental.brorental.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.activities.RentDetailsActivity;
 import com.brorental.brorental.databinding.RentListItemBinding;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 
 public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.ViewHolder> {
     private Context ctx;
+    private MainActivity activity;
     private String TAG = "RentListAdapter.java";
     public RentListAdapter(Context ctx) {
         super(new DiffUtil.ItemCallback<RentItemModel>() {
@@ -41,6 +44,7 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
             }
         });
         this.ctx = ctx;
+        this.activity = (MainActivity) ctx;
     }
 
     @NonNull
@@ -69,7 +73,7 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
                 Gson gson = new Gson();
                 String json = gson.toJson(data);
                 i.putExtra("data", json);
-                ctx.startActivity(i);
+                activity.startActivityForRes(i);
             }
         });
     }
