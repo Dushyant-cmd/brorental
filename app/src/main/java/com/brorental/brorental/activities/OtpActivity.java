@@ -48,7 +48,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class OtpActivity extends AppCompatActivity {
-
     //Firebase Authentication product or library java class in android
     private FirebaseAuth mAuth;
 
@@ -82,6 +81,7 @@ public class OtpActivity extends AppCompatActivity {
         binding.login.setEnabled(false);
         sharedPreferences = new SharedPref(OtpActivity.this);
         dialog = new ProgressDialog(OtpActivity.this);
+        dialog.setCancelable(false);
         mFirestore = FirebaseFirestore.getInstance();
 
         //set the TextWatcher interface instance on otp pinView

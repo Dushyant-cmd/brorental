@@ -139,5 +139,6 @@ public class SharedPref {
 
     public void logout() {
         sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
     }
 }

@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
         nameTV.setText(appClass.sharedPref.getUser().getName());
 
-        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(imageView);
+        Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
             case 101:
                 headerWalletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
                 headerNameTV.setText(appClass.sharedPref.getUser().getName());
-                Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
+                Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
                 break;
             default:
                 break;
