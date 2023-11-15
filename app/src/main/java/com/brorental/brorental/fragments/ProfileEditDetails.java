@@ -3,7 +3,9 @@ package com.brorental.brorental.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,6 +67,8 @@ public class ProfileEditDetails extends Fragment {
     private ProgressDialog dialog;
     private UtilsInterface.RefreshInterface refreshInterface;
     private boolean isKyc = false;
+    private boolean isPermissionGranted = false;
+
     public ProfileEditDetails(UtilsInterface.RefreshInterface refreshInterface) {
         this.refreshInterface = refreshInterface;
     }
@@ -653,12 +658,13 @@ public class ProfileEditDetails extends Fragment {
     public void onPause() {
         super.onPause();
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         refreshInterface.refresh(0);
         if (!appClass.sharedPref.getEmail().isEmpty() && !appClass.sharedPref.getAlternateMob().isEmpty() && appClass.sharedPref.getAadhaarImg() != null && appClass.sharedPref.getUser().getProfileUrl() != null && appClass.sharedPref.getDLImg() != null) {
-            if(appClass.sharedPref.getStatus().matches("pending")) {
+            if (appClass.sharedPref.getStatus().matches("pending")) {
                 appClass.sharedPref.setStatus("approved");
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("status", "approved");
@@ -670,6 +676,39 @@ public class ProfileEditDetails extends Fragment {
                                 Log.d(TAG, "onSuccess: success");
                             }
                         });
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    isPermissionGranted = true;
+                } else if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    isPermissionGranted = false;
+                    break;
+                }
+            }
+
+            if (!isPermissionGranted) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                        .setMessage("Please allow all permissions to continue")
+                        .setTitle("Permission denied")
+                        .setCancelable(false)
+                        .setIcon(R.drawable.brorental_logo)
+                        .setPositiveButton("Allow Permissions", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.fromParts("package", requireActivity().getPackageName(), null));
+                                startActivity(intent);
+                                dialogInterface.dismiss();
+                            }
+                        });
+                builder.show();
             }
         }
     }
