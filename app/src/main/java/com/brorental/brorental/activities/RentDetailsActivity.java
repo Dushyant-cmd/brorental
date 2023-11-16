@@ -72,8 +72,6 @@ public class RentDetailsActivity extends AppCompatActivity {
             for (String url : images) {
                 list.add(new SlideModel(url, ScaleTypes.FIT));
             }
-            list.add(new SlideModel(images[0], ScaleTypes.FIT));
-            list.add(new SlideModel(images[0], ScaleTypes.FIT));
             binding.imageSlider.setImageList(list, ScaleTypes.FIT);
             binding.imageSlider.setItemClickListener(new ItemClickListener() {
                 @Override

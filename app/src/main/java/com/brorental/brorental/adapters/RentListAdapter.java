@@ -62,8 +62,9 @@ public class RentListAdapter extends ListAdapter<RentItemModel, RentListAdapter.
         String spanned = data.getPerHourCharge();
         holder.binding.perHourTV.setText("\u20B9 " + Html.fromHtml(spanned));
         holder.binding.timingsTV.setText(data.getTimings());
-
-        Glide.with(ctx).load(data.getAdsImageUrl()).placeholder(R.drawable.american_flag)
+        Log.d(TAG, "onBindViewHolder: " + data.getAdsImageUrl());
+        String thumbnail = data.getAdsImageUrl().split(",")[0];
+        Glide.with(ctx).load(thumbnail).placeholder(com.denzcoskun.imageslider.R.drawable.placeholder)
                 .into(holder.binding.pdImgView);
 
         holder.binding.root.setOnClickListener(new View.OnClickListener() {
