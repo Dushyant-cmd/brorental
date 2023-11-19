@@ -148,6 +148,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                         else if (fromDate.isEmpty() && toDate.isEmpty())
                             DialogCustoms.showSnackBar(getActivity(), "Please select date", binding.getRoot());
                         else {
+                            /** TODO make dynamic amount of rent item. */
                             Intent i = new Intent(getActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
                             bundle.putString("amt", "1");

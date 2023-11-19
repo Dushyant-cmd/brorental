@@ -262,7 +262,8 @@ public class PaymentActivity extends AppCompatActivity {
                                                 map2.put("advertisementId", model.getAdvertisementId());
                                                 map2.put("totalRentCost", rechargeAmt);
                                                 map2.put("extraCharge", model.getExtraCharge());
-                                                map2.put("id", UUID.randomUUID().toString());
+                                                String docId = UUID.randomUUID().toString();
+                                                map2.put("id", docId);
                                                 map2.put("rentStartTime", rentStart);
                                                 map2.put("rentEndTime", rentEnd);
                                                 map2.put("broRentalId", sharedPreferences.getUser().getPin());
@@ -276,13 +277,13 @@ public class PaymentActivity extends AppCompatActivity {
                                                 map2.put("timestamp", System.currentTimeMillis());
                                                 map2.put("broPartnerMobile", model.getBroPartnerMobile());
                                                 map2.put("broRentalMobile", sharedPreferences.getUser().getMobile());
-                                                firestore.collection("rentHistory").add(map2)
-                                                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                                firestore.collection("rentHistory").document(docId).set(map2)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
-                                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                            public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
                                                                     appClass.firestore.collection("appData").document("balance")
-                                                                                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                                 @Override
                                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                                     if(task.isSuccessful()) {
