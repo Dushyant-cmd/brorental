@@ -15,13 +15,18 @@ import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.room.Room;
 
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.adapters.HintAdapter;
 import com.brorental.brorental.databinding.FragmentSearchBinding;
 import com.brorental.brorental.interfaces.UtilsInterface;
+import com.brorental.brorental.localdb.RoomDb;
 import com.brorental.brorental.localdb.SharedPref;
+import com.brorental.brorental.localdb.StateEntity;
+import com.brorental.brorental.retrofit.ApiService;
+import com.brorental.brorental.retrofit.RetrofitClient;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.Utility;
@@ -29,10 +34,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchFragment extends Fragment {
     public FragmentSearchBinding binding;
@@ -40,9 +55,13 @@ public class SearchFragment extends Fragment {
     private ArrayList<String> hintList = new ArrayList<>();
     private AppClass appClass;
     private HintAdapter adapter;
+    private ArrayAdapter<String> arrayAdapter;
     private FirebaseFirestore mFirestore;
     private String[] cateArr;
     private ArrayList<String> stateList = new ArrayList<>();
+    private List<StateEntity> roomList = new ArrayList<>();
+    private ApiService apiService;
+    private RoomDb roomDb;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,10 +72,22 @@ public class SearchFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.recyclerView.setAdapter(adapter);
         mFirestore = ((AppClass) getActivity().getApplication()).firestore;
-        stateList.add("Select a state");
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
+        roomDb = RoomDb.getInstance(requireContext());
+        roomList = roomDb.getStateDao().getStates();
+        stateList.add("Select your state");
+
         if (Utility.isNetworkAvailable(getActivity())) {
             getCategories();
-            getState();
+            if (roomList.isEmpty())
+                getState();
+            else {
+                for(int i=0; i<roomList.size(); i++) {
+                    stateList.add(roomList.get(i).getState());
+                }
+                arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, stateList);
+                binding.spinner.setAdapter(arrayAdapter);
+            }
         } else {
             noNetworkDialog();
         }
@@ -105,7 +136,7 @@ public class SearchFragment extends Fragment {
                 if(!stateList.isEmpty()) {
                     try {
                         MainActivity hostAct = (MainActivity) getActivity();
-                        hostAct.getData((String) binding.spinner.getSelectedItem(), hintList.get(catePosition));
+                        hostAct.getData(binding.spinner.getSelectedItem().toString().toLowerCase(), hintList.get(catePosition).toLowerCase());
                         appClass.sharedPref.setState((String) binding.spinner.getSelectedItem());
                         Utility.hideKeyboardFrom(getActivity(), getContext(), binding.getRoot(), true);
                         hostAct.getSupportFragmentManager().popBackStackImmediate();
@@ -123,31 +154,70 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void getState() {
-        mFirestore.collection("appData").document("constants")
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
-                            Log.d(TAG, "onComplete: " + task.getResult().getString("state"));
-                            String[] states = task.getResult().getString("state").split(",");
-                            Collections.addAll(stateList, states);
-                            if(!appClass.sharedPref.getState().isEmpty()) {
-                                int selectedStatePos = stateList.indexOf(appClass.sharedPref.getState());
-                                stateList.remove(selectedStatePos);
-                                stateList.remove(0);
-                                stateList.add(0, appClass.sharedPref.getState());
-                            }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, stateList);
-                            binding.spinner.setAdapter(adapter);
-                            binding.spinner.setVisibility(View.VISIBLE);
-                        } else {
-                            Log.d(TAG, "onComplete: " + task.getException());
-                        }
-                    }
-                });
-    }
+//    private void getState() {
+//        mFirestore.collection("appData").document("constants")
+//                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if(task.isSuccessful()) {
+//                            Log.d(TAG, "onComplete: " + task.getResult().getString("state"));
+//                            String[] states = task.getResult().getString("state").split(",");
+//                            Collections.addAll(stateList, states);
+//                            if(!appClass.sharedPref.getState().isEmpty()) {
+//                                int selectedStatePos = stateList.indexOf(appClass.sharedPref.getState());
+//                                stateList.remove(selectedStatePos);
+//                                stateList.remove(0);
+//                                stateList.add(0, appClass.sharedPref.getState());
+//                            }
+//                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, stateList);
+//                            binding.spinner.setAdapter(adapter);
+//                            binding.spinner.setVisibility(View.VISIBLE);
+//                        } else {
+//                            Log.d(TAG, "onComplete: " + task.getException());
+//                        }
+//                    }
+//                });
+//    }
 
+    private void getState() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("country", "india");
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (json).toString());
+            String url = "https://countriesnow.space/api/v0.1/countries/states";
+            apiService.getCountryState(url, body)
+                    .enqueue(new Callback<JsonObject>() {
+                        @Override
+                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                            if (response.isSuccessful()) {
+                                try {
+                                    roomDb.getStateDao().deleteStates();
+                                    JSONObject json1 = new JSONObject(response.body().toString());
+                                    JSONObject dataJs = json1.getJSONObject("data");
+                                    JSONArray jsonArray1 = dataJs.getJSONArray("states");
+                                    for (int i = 0; i < jsonArray1.length(); i++) {
+                                        JSONObject js = jsonArray1.getJSONObject(i);
+                                        roomDb.getStateDao().insertState(new StateEntity(js.getString("name")));
+                                        stateList.add(js.getString("name"));
+                                    }
+
+                                    arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, stateList);
+                                    binding.spinner.setAdapter(arrayAdapter);
+                                } catch (Exception e) {
+//                                    createErrorDialog(requireActivity(), e.getMessage());
+                                    Log.d(TAG, "onResponse: " + e);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<JsonObject> call, Throwable t) {
+                        }
+                    });
+        } catch (Exception e) {
+            Log.d(TAG, "getStates: " + e);
+        }
+    }
     private void noNetworkDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
@@ -157,7 +227,15 @@ public class SearchFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if (Utility.isNetworkAvailable(getActivity())) {
                     getCategories();
-                    getState();
+                    if (roomList.isEmpty())
+                        getState();
+                    else {
+                        for(int i=0; i<roomList.size(); i++) {
+                            stateList.add(roomList.get(i).getState());
+                        }
+                        arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, stateList);
+                        binding.spinner.setAdapter(arrayAdapter);
+                    }
                     dialog.dismiss();
                 } else {
                     dialog.dismiss();
