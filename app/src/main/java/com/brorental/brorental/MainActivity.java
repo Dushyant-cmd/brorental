@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
         headerNameTV = headerView.findViewById(R.id.nameTV);
         headerWalletLL = headerView.findViewById(R.id.walletLL);
-        headerWalletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
+        headerWalletTV.setText("\u20B9 " + (2500 * Long.parseLong(appClass.sharedPref.getUser().getTotalRent())) + appClass.sharedPref.getUser().getWallet());
         headerNameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         TextView viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
         TextView nameTV = headerView.findViewById(R.id.nameTV);
         LinearLayout walletLL = headerView.findViewById(R.id.walletLL);
-        walletTV.setText("\u20B9 " + appClass.sharedPref.getUser().getWallet());
+        walletTV.setText("\u20B9 " + Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) + appClass.sharedPref.getUser().getWallet());
         nameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(imageView);
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult: 44");
         switch (reqCode) {
             case 101:
-                headerWalletTV.setText(Utility.rupeeIcon + appClass.sharedPref.getUser().getWallet());
+                headerWalletTV.setText(Utility.rupeeIcon +  Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) + appClass.sharedPref.getUser().getWallet());
                 headerNameTV.setText(appClass.sharedPref.getUser().getName());
                 Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
                 break;

@@ -27,7 +27,6 @@ import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
@@ -155,6 +154,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                             Intent i = new Intent(getActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
                             bundle.putString("amt", String.valueOf(rentAmt));
+//                            bundle.putString("amt", "1");
                             bundle.putString("id", advertId);
                             bundle.putString("data", data.toString());
                             bundle.putString("rentStartDate", fromDate);
@@ -245,12 +245,20 @@ public class RentDetailsActivity extends AppCompatActivity {
             try {
                 long diffHours = TimeUnit.HOURS.convert(format.parse(newDate).getTime()
                         - format.parse(oldDate).getTime(), TimeUnit.MILLISECONDS);
-                Log.d(TAG, "setPrice: " + diffHours);
+//                Log.d(TAG, "setPrice: " + diffHours);
+                if(diffHours < 0) {
+                    DialogCustoms.showSnackBar(requireActivity(), "Invalid Date and Time", binding.getRoot());
+                    return 0L;
+                }
+
                 binding.extraAmtTV.setText("\u20B9 " + extraCharge + " /hour");
                 binding.textLL.setVisibility(View.VISIBLE);
-                long walletUseAmt = 2500 - Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                rentAmt = walletUseAmt - (diffHours * Long.parseLong(perHourCharge));
-                binding.totalAmtV.setText(Utility.rupeeIcon + rentAmt);
+                long wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                rentAmt = (diffHours * Long.parseLong(perHourCharge));
+                rentAmt = ((rentAmt - wal) + 2500);
+                binding.totalAmtV.setText(Utility.rupeeIcon + (2500 + rentAmt));
+                binding.tvSecDep.setText("Security deposit: +" + Utility.rupeeIcon + 2500);
+                binding.walletTV.setText("Wallet amount: -" + Utility.rupeeIcon + wal);
                 return diffHours;
             } catch (Exception e) {
                 e.printStackTrace();

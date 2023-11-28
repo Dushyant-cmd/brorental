@@ -226,95 +226,108 @@ public class PaymentActivity extends AppCompatActivity {
                         updatedBalance = currentUserBalance - Long.parseLong(transactionAmt);
                     else
                         updatedBalance = currentUserBalance + Long.parseLong(transactionAmt);
-                    //Map interface subclass instance contains value object in key-value pair where key must be a String.
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("wallet", String.valueOf(updatedBalance));
-                    firestore.collection("users").document(sharedPreferences.getUser().getPin() + "").update(map)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                    firestore.collection("users")
+                            .document(appClass.sharedPref.getUser().getPin()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
-                                public void onSuccess(Void unused) {
-                                    sharedPreferences.setWallet(String.valueOf(updatedBalance));
-                                    HashMap<String, Object> map = new HashMap<>();
-                                    map.put("amount", transactionAmt);
-                                    map.put("date", dateAndTime);
-                                    map.put("info", null);
-                                    map.put("name", sharedPreferences.getUser().getName());
-                                    map.put("status", "completed");
-                                    if (isRentPayment)
-                                        map.put("type", "rent");
-                                    else if (isAddCash)
-                                        map.put("type", "addCash");
-                                    else if (isRidePayment)
-                                        map.put("type", "ride");
-                                    map.put("advertisementId", advertId);
-                                    map.put("timestamp", System.currentTimeMillis());
-                                    map.put("isBroRental", true);
-                                    map.put("broRentalId", sharedPreferences.getUser().getPin());
-                                    map.put("broPartnerId", broPartnerId);
-                                    firestore.collection("transactions").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            if (isRentPayment) {
-                                                HashMap<String, Object> map2 = new HashMap<>();
-                                                map2.put("rentImages", model.getAdsImageUrl());
-                                                map2.put("name", model.getName());
-                                                map2.put("advertisementId", model.getAdvertisementId());
-                                                map2.put("totalRentCost", rechargeAmt);
-                                                map2.put("extraCharge", model.getExtraCharge());
-                                                String docId = UUID.randomUUID().toString();
-                                                map2.put("id", docId);
-                                                map2.put("rentStartTime", rentStart);
-                                                map2.put("rentEndTime", rentEnd);
-                                                map2.put("broRentalId", sharedPreferences.getUser().getPin());
-                                                map2.put("broPartnerId", broPartnerId);
-                                                map2.put("status", "pending");
-                                                map2.put("totalHours", hours);
-                                                map2.put("category", model.getCategory());
-                                                map2.put("address", model.getAddress());
-                                                map2.put("perHourCharge", model.getPerHourCharge());
-                                                map2.put("paymentMode", "online");
-                                                map2.put("timestamp", System.currentTimeMillis());
-                                                map2.put("broPartnerMobile", model.getBroPartnerMobile());
-                                                map2.put("broRentalMobile", sharedPreferences.getUser().getMobile());
-                                                firestore.collection("rentHistory").document(docId).set(map2)
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        long totalRentItem = Long.parseLong(task.getResult().getString("totalRentItem")) + 1;
+                                        //Map interface subclass instance contains value object in key-value pair where key must be a String.
+                                        HashMap<String, Object> map = new HashMap<>();
+                                        map.put("wallet", String.valueOf(updatedBalance));
+                                        map.put("totalRentItem", String.valueOf(totalRentItem));
+                                        firestore.collection("users").document(sharedPreferences.getUser().getPin() + "").update(map)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        sharedPreferences.setWallet(String.valueOf(updatedBalance));
+                                                        HashMap<String, Object> map = new HashMap<>();
+                                                        map.put("amount", transactionAmt);
+                                                        map.put("date", dateAndTime);
+                                                        map.put("info", null);
+                                                        map.put("name", sharedPreferences.getUser().getName());
+                                                        map.put("status", "completed");
+                                                        if (isRentPayment)
+                                                            map.put("type", "rent");
+                                                        else if (isAddCash)
+                                                            map.put("type", "addCash");
+                                                        else if (isRidePayment)
+                                                            map.put("type", "ride");
+                                                        map.put("advertisementId", advertId);
+                                                        map.put("timestamp", System.currentTimeMillis());
+                                                        map.put("isBroRental", true);
+                                                        map.put("broRentalId", sharedPreferences.getUser().getPin());
+                                                        map.put("broPartnerId", broPartnerId);
+                                                        firestore.collection("transactions").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                             @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    long walUseAmt = 2500 - Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                                                                    long walDedAmt = walUseAmt - Long.parseLong(rechargeAmt);
-                                                                    String newWalAmt = String.valueOf(walDedAmt - Long.parseLong(appClass.sharedPref.getUser().getWallet()));
-                                                                    HashMap<String, Object> userMap = new HashMap<>();
-                                                                    userMap.put("wallet", newWalAmt);
-                                                                    appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
-                                                                            .update(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            public void onSuccess(DocumentReference documentReference) {
+                                                                if (isRentPayment) {
+                                                                    HashMap<String, Object> map2 = new HashMap<>();
+                                                                    map2.put("rentImages", model.getAdsImageUrl());
+                                                                    map2.put("name", model.getName());
+                                                                    map2.put("advertisementId", model.getAdvertisementId());
+                                                                    map2.put("totalRentCost", rechargeAmt);
+                                                                    map2.put("extraCharge", model.getExtraCharge());
+                                                                    String docId = UUID.randomUUID().toString();
+                                                                    map2.put("id", docId);
+                                                                    map2.put("rentStartTime", rentStart);
+                                                                    map2.put("rentEndTime", rentEnd);
+                                                                    map2.put("broRentalId", sharedPreferences.getUser().getPin());
+                                                                    map2.put("broPartnerId", broPartnerId);
+                                                                    map2.put("status", "pending");
+                                                                    map2.put("totalHours", hours);
+                                                                    map2.put("category", model.getCategory());
+                                                                    map2.put("address", model.getAddress());
+                                                                    map2.put("perHourCharge", model.getPerHourCharge());
+                                                                    map2.put("paymentMode", "online");
+                                                                    map2.put("timestamp", System.currentTimeMillis());
+                                                                    map2.put("broPartnerMobile", model.getBroPartnerMobile());
+                                                                    map2.put("broRentalMobile", sharedPreferences.getUser().getMobile());
+                                                                    firestore.collection("rentHistory").document(docId).set(map2)
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
                                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                                     if (task.isSuccessful()) {
-                                                                                        appClass.sharedPref.setWallet(newWalAmt);
-                                                                                    } else {
-                                                                                        Log.d(TAG, "onComplete: " + task.getException());
-                                                                                    }
-                                                                                }
-                                                                            });
-
-                                                                    appClass.firestore.collection("appData").document("balance")
-                                                                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                @Override
-                                                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                    if (task.isSuccessful()) {
-                                                                                        DocumentSnapshot d = task.getResult();
-                                                                                        long prevAmt = d.getLong("rentAmt");
-                                                                                        long amt = prevAmt + Long.parseLong(rechargeAmt);
-                                                                                        HashMap<String, Object> map = new HashMap<>();
-                                                                                        map.put("rentAmt", amt);
-                                                                                        firestore.collection("appData").document("balance")
-                                                                                                .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        long wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                                                                                        long dedWal = wal - (Long.parseLong(rechargeAmt) - 2500);
+                                                                                        String newWalAmt = String.valueOf(dedWal);
+                                                                                        HashMap<String, Object> userMap = new HashMap<>();
+                                                                                        userMap.put("wallet", newWalAmt);
+                                                                                        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                                                                                                .update(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                                     @Override
                                                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                                                         if (task.isSuccessful()) {
-                                                                                                            Log.v(tag, "success");
-                                                                                                            Toast.makeText(getApplicationContext(), "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                            appClass.sharedPref.setWallet(newWalAmt);
+                                                                                                        } else {
+                                                                                                            Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
+
+                                                                                        appClass.firestore.collection("appData").document("balance")
+                                                                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                        if (task.isSuccessful()) {
+                                                                                                            DocumentSnapshot d = task.getResult();
+                                                                                                            long prevAmt = d.getLong("rentAmt");
+                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt);
+                                                                                                            HashMap<String, Object> map = new HashMap<>();
+                                                                                                            map.put("rentAmt", amt);
+                                                                                                            firestore.collection("appData").document("balance")
+                                                                                                                    .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                        @Override
+                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                            if (task.isSuccessful()) {
+                                                                                                                                Log.v(tag, "success");
+                                                                                                                                Toast.makeText(getApplicationContext(), "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                                            } else {
+                                                                                                                                Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    });
                                                                                                         } else {
                                                                                                             Log.d(TAG, "onComplete: " + task.getException());
                                                                                                         }
@@ -325,29 +338,31 @@ public class PaymentActivity extends AppCompatActivity {
                                                                                     }
                                                                                 }
                                                                             });
-                                                                } else {
-                                                                    Log.d(TAG, "onComplete: " + task.getException());
+                                                                } else if (isAddCash) {
+                                                                    Log.v(tag, "success");
+                                                                    Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
                                                                 }
                                                             }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.v(tag, e + "");
+                                                            }
                                                         });
-                                            } else if (isAddCash) {
-                                                Log.v(tag, "success");
-                                                Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
-                                            }
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.v(tag, e + "");
-                                        }
-                                    });
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.v(tag, e + "");
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.v(tag, e + "");
+                                                    }
+                                                });
+                                    } else {
+                                        Log.d(TAG, "onComplete: " + task.getException());
+                                    }
                                 }
                             });
+
+
                 }
             } else if ("Payment cancelled by user.".equals(paymentCancel)) {
                 Toast.makeText(PaymentActivity.this, "Payment cancelled by user.", Toast.LENGTH_SHORT).show();

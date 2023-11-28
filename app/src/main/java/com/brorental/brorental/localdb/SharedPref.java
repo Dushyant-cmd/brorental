@@ -30,6 +30,7 @@ public class SharedPref {
     public void setCustomerCareNum(String num) {
         sharedPreferences.edit().putString("customerCareNum", num).apply();
     }
+
     public boolean isLogin() {
         return sharedPreferences.getBoolean("isLogin", false);
     }
@@ -144,16 +145,20 @@ public class SharedPref {
         sharedPreferences.edit().putString("status", status).apply();
     }
 
+    public long getSecurityDeposit() {
+        return sharedPreferences.getLong("securityDeposit", 0L);
+    }
+
+    public void setSecurityDeposit(long status) {
+        sharedPreferences.edit().putLong("securityDeposit", status).apply();
+    }
+
     public void logout() {
         sharedPreferences.edit().clear().apply();
         sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
     }
 
-    public boolean isReadyForRide() {
-        return sharedPreferences.getBoolean("isReadyForRide", true);
-    }
-
-    public void setReadyForRide() {
-        sharedPreferences.edit().putBoolean("isReadyForRide", true).apply();
+    public void setTotalRentItem(String totalRentItem) {
+        sharedPreferences.edit().putString("totalRentItem", totalRentItem);
     }
 }
