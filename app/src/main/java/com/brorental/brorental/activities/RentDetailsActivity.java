@@ -106,7 +106,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                         if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
                             DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
                         } else {
-                            PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data);
+                            PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data, application);
                             sheet.show(getSupportFragmentManager(), PayBottomSheet.TAG);
                         }
                     } catch (Exception e) {
@@ -125,13 +125,16 @@ public class RentDetailsActivity extends AppCompatActivity {
         private JSONObject data;
         private String fromDate = "", toDate = "";
         private long fromTS, toTS, hours;
+        private long rentAmt = 0L;
         private PaymentBottomSheetBinding binding;
+        private AppClass appClass;
 
-        public PayBottomSheet(String advertId, String perHourCharge, String extraCharge, JSONObject data) {
+        public PayBottomSheet(String advertId, String perHourCharge, String extraCharge, JSONObject data, AppClass appClass) {
             this.advertId = advertId;
             this.perHourCharge = perHourCharge;
             this.data = data;
             this.extraCharge = extraCharge;
+            this.appClass = appClass;
         }
 
         @Nullable
@@ -151,7 +154,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                             /** TODO make dynamic amount of rent item. */
                             Intent i = new Intent(getActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
-                            bundle.putString("amt", "1");
+                            bundle.putString("amt", String.valueOf(rentAmt));
                             bundle.putString("id", advertId);
                             bundle.putString("data", data.toString());
                             bundle.putString("rentStartDate", fromDate);
@@ -227,7 +230,6 @@ public class RentDetailsActivity extends AppCompatActivity {
 
                     if (fromTS > 0L) {
                         String[] str = fromDate.split("-");
-                        Log.d(TAG, "onClick: " + str[0] + "," + str[1] + "," + str[2].split(" ")[0]);
                         calendar.set(Integer.parseInt(str[2].split(" ")[0]), Integer.parseInt(str[1]), Integer.parseInt(str[0]));
                     }
 
@@ -244,9 +246,11 @@ public class RentDetailsActivity extends AppCompatActivity {
                 long diffHours = TimeUnit.HOURS.convert(format.parse(newDate).getTime()
                         - format.parse(oldDate).getTime(), TimeUnit.MILLISECONDS);
                 Log.d(TAG, "setPrice: " + diffHours);
-                binding.totalAmtV.setText("\u20B9 " + (diffHours * Long.parseLong(perHourCharge)));
                 binding.extraAmtTV.setText("\u20B9 " + extraCharge + " /hour");
                 binding.textLL.setVisibility(View.VISIBLE);
+                long walletUseAmt = 2500 - Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                rentAmt = walletUseAmt - (diffHours * Long.parseLong(perHourCharge));
+                binding.totalAmtV.setText(Utility.rupeeIcon + rentAmt);
                 return diffHours;
             } catch (Exception e) {
                 e.printStackTrace();

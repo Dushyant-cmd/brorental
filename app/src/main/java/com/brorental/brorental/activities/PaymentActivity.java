@@ -14,9 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
-import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.utilities.AppClass;
@@ -53,6 +51,7 @@ public class PaymentActivity extends AppCompatActivity {
     private JSONObject jsonData;
     private RentItemModel model;
     private AppClass appClass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -282,24 +281,39 @@ public class PaymentActivity extends AppCompatActivity {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
-                                                                    appClass.firestore.collection("appData").document("balance")
-                                                                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                    long walUseAmt = 2500 - Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                                                                    long walDedAmt = walUseAmt - Long.parseLong(rechargeAmt);
+                                                                    String newWalAmt = String.valueOf(walDedAmt - Long.parseLong(appClass.sharedPref.getUser().getWallet()));
+                                                                    HashMap<String, Object> userMap = new HashMap<>();
+                                                                    userMap.put("wallet", newWalAmt);
+                                                                    appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
+                                                                            .update(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
-                                                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                    if(task.isSuccessful()) {
-                                                                                        DocumentSnapshot d = task.getResult();
-                                                                                        long prevAmt = d.getLong("rentAmt");
-                                                                                        long amt = prevAmt + Long.parseLong(rechargeAmt);
-                                                                                        HashMap<String, Object> map = new HashMap<>();
-                                                                                        map.put("rentAmt", amt);
-                                                                                        firestore.collection("appData").document("balance")
-                                                                                                .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    if (task.isSuccessful()) {
+                                                                                        appClass.sharedPref.setWallet(newWalAmt);
+                                                                                        appClass.firestore.collection("appData").document("balance")
+                                                                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                                                     @Override
-                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                        if(task.isSuccessful()) {
-
-                                                                                                            Log.v(tag, "success");
-                                                                                                            Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                        if (task.isSuccessful()) {
+                                                                                                            DocumentSnapshot d = task.getResult();
+                                                                                                            long prevAmt = d.getLong("rentAmt");
+                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt);
+                                                                                                            HashMap<String, Object> map = new HashMap<>();
+                                                                                                            map.put("rentAmt", amt);
+                                                                                                            firestore.collection("appData").document("balance")
+                                                                                                                    .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                        @Override
+                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                            if (task.isSuccessful()) {
+                                                                                                                                Log.v(tag, "success");
+                                                                                                                                Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                                            } else {
+                                                                                                                                Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    });
                                                                                                         } else {
                                                                                                             Log.d(TAG, "onComplete: " + task.getException());
                                                                                                         }

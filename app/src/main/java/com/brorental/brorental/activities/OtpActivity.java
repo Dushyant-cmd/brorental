@@ -383,7 +383,7 @@ public class OtpActivity extends AppCompatActivity {
                     DocumentSnapshot d = task.getResult().getDocuments().get(0);
                     if (d.getBoolean("termsCheck")) {
                         //login
-                        Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(OtpActivity.this, "Old users can't redeem referral code!", Toast.LENGTH_LONG).show();
                         Intent i = new Intent(OtpActivity.this, MainActivity.class);
                         i.putExtra("phone", phone);//with +91 code in phone variable.
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
