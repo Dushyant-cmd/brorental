@@ -2,6 +2,7 @@ package com.brorental.brorental.utilities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -10,7 +11,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.brorental.brorental.broadcasts.ConnectionBroadcast;
+import com.brorental.brorental.interfaces.UtilsInterface;
 
 public class Utility {
     public static String TAG = "Utility.java", rupeeIcon = "\u20B9";
@@ -50,5 +54,26 @@ public class Utility {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         ctx.registerReceiver(new ConnectionBroadcast(), intentFilter);
+    }
+
+    public static void noNetworkDialog(Context ctx, UtilsInterface.RefreshInterface refreshInterface) {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setMessage("No connection");
+            builder.setCancelable(false);
+            builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (isNetworkAvailable(ctx)) {
+                        dialogInterface.dismiss();
+                        refreshInterface.refresh(0);
+                    } else
+                        noNetworkDialog(ctx, refreshInterface);
+                }
+            });
+            builder.create().show();
+        } catch (Exception e) {
+            Log.d(TAG, "noNetworkDialog: " + e);
+        }
     }
 }

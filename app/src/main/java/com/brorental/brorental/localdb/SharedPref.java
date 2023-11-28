@@ -23,6 +23,13 @@ public class SharedPref {
         edit.apply();
     }
 
+    public String getCustomerCareNum() {
+        return sharedPreferences.getString("customerCareNum", "");
+    }
+
+    public void setCustomerCareNum(String num) {
+        sharedPreferences.edit().putString("customerCareNum", num).apply();
+    }
     public boolean isLogin() {
         return sharedPreferences.getBoolean("isLogin", false);
     }
@@ -140,5 +147,13 @@ public class SharedPref {
     public void logout() {
         sharedPreferences.edit().clear().apply();
         sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
+    }
+
+    public boolean isReadyForRide() {
+        return sharedPreferences.getBoolean("isReadyForRide", true);
+    }
+
+    public void setReadyForRide() {
+        sharedPreferences.edit().putBoolean("isReadyForRide", true).apply();
     }
 }

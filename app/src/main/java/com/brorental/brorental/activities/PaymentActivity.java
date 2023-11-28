@@ -292,28 +292,29 @@ public class PaymentActivity extends AppCompatActivity {
                                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                                     if (task.isSuccessful()) {
                                                                                         appClass.sharedPref.setWallet(newWalAmt);
-                                                                                        appClass.firestore.collection("appData").document("balance")
-                                                                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                    } else {
+                                                                                        Log.d(TAG, "onComplete: " + task.getException());
+                                                                                    }
+                                                                                }
+                                                                            });
+
+                                                                    appClass.firestore.collection("appData").document("balance")
+                                                                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                    if (task.isSuccessful()) {
+                                                                                        DocumentSnapshot d = task.getResult();
+                                                                                        long prevAmt = d.getLong("rentAmt");
+                                                                                        long amt = prevAmt + Long.parseLong(rechargeAmt);
+                                                                                        HashMap<String, Object> map = new HashMap<>();
+                                                                                        map.put("rentAmt", amt);
+                                                                                        firestore.collection("appData").document("balance")
+                                                                                                .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                                     @Override
-                                                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
                                                                                                         if (task.isSuccessful()) {
-                                                                                                            DocumentSnapshot d = task.getResult();
-                                                                                                            long prevAmt = d.getLong("rentAmt");
-                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt);
-                                                                                                            HashMap<String, Object> map = new HashMap<>();
-                                                                                                            map.put("rentAmt", amt);
-                                                                                                            firestore.collection("appData").document("balance")
-                                                                                                                    .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                        @Override
-                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                            if (task.isSuccessful()) {
-                                                                                                                                Log.v(tag, "success");
-                                                                                                                                Toast.makeText(PaymentActivity.this, "Transaction done successfully", Toast.LENGTH_LONG).show();
-                                                                                                                            } else {
-                                                                                                                                Log.d(TAG, "onComplete: " + task.getException());
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    });
+                                                                                                            Log.v(tag, "success");
+                                                                                                            Toast.makeText(getApplicationContext(), "Transaction done successfully", Toast.LENGTH_LONG).show();
                                                                                                         } else {
                                                                                                             Log.d(TAG, "onComplete: " + task.getException());
                                                                                                         }

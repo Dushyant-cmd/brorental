@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityRideBinding;
 import com.brorental.brorental.utilities.AppClass;
+import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.Utility;
 
 public class RideActivity extends AppCompatActivity {
@@ -21,7 +22,15 @@ public class RideActivity extends AppCompatActivity {
         appClass = (AppClass) getApplication();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(RideActivity.this, appClass);
+        getData();
         setListeners();
+    }
+
+    private void getData() {
+        if(!Utility.isNetworkAvailable(RideActivity.this)) {
+
+        } else {
+        }
     }
 
     private void setListeners() {
