@@ -16,6 +16,11 @@ import androidx.appcompat.app.AlertDialog;
 import com.brorental.brorental.broadcasts.ConnectionBroadcast;
 import com.brorental.brorental.interfaces.UtilsInterface;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class Utility {
     public static String TAG = "Utility.java", rupeeIcon = "\u20B9";
     //To check connectivity with network
@@ -75,5 +80,13 @@ public class Utility {
         } catch (Exception e) {
             Log.d(TAG, "noNetworkDialog: " + e);
         }
+    }
+
+    public static String getCurrDateAndTime(Context ctx) {
+        Calendar cal = Calendar.getInstance();
+        Date date = cal.getTime();
+        SimpleDateFormat spf = new SimpleDateFormat("dd-MM-yyyy, hh:mm:ss a", Locale.getDefault());
+        String dateAndTime = spf.format(date);
+        return dateAndTime;
     }
 }

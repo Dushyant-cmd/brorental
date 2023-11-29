@@ -68,7 +68,7 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot d) {
                         appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
-                                d.getString("totalRent"), d.getString("totalRide"), true,
+                                d.getString("totalRentItem"), d.getString("totalRides"), true,
                                 d.getString("profileUrl"), d.getString("wallet")));
                         appClass.sharedPref.setAadhaarImg(d.getString("aadhaarImgUrl"));
                         appClass.sharedPref.setAadhaarPath(d.getString("aadhaarImgPath"));

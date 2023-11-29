@@ -97,7 +97,9 @@ public class MainActivity extends AppCompatActivity {
         viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
         headerNameTV = headerView.findViewById(R.id.nameTV);
         headerWalletLL = headerView.findViewById(R.id.walletLL);
-        headerWalletTV.setText("\u20B9 " + (2500 * Long.parseLong(appClass.sharedPref.getUser().getTotalRent())) + appClass.sharedPref.getUser().getWallet());
+        Log.d(TAG, "onCreate: " + appClass.sharedPref.getUser().getTotalRent() + "\n" + appClass.sharedPref.getUser().getWallet());
+        long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
+        headerWalletTV.setText("\u20B9 " + wal);
         headerNameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
@@ -140,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
         TextView viewProfileTV = headerView.findViewById(R.id.viewProfileTV);
         TextView nameTV = headerView.findViewById(R.id.nameTV);
         LinearLayout walletLL = headerView.findViewById(R.id.walletLL);
-        walletTV.setText("\u20B9 " + Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) + appClass.sharedPref.getUser().getWallet());
+        long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
+        walletTV.setText("\u20B9 " + wal);
         nameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(imageView);
@@ -199,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, PaymentHistory.class);
-                startActivity(i);
+                startActivityForRes(i);
             }
         });
 
@@ -283,7 +286,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult: 44");
         switch (reqCode) {
             case 101:
-                headerWalletTV.setText(Utility.rupeeIcon +  Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) + appClass.sharedPref.getUser().getWallet());
+                long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                headerWalletTV.setText(Utility.rupeeIcon + wal);
                 headerNameTV.setText(appClass.sharedPref.getUser().getName());
                 Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
                 break;

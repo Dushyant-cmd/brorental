@@ -399,14 +399,14 @@ public class OtpActivity extends AppCompatActivity {
                         sharedPreferences.setStatus(d.getString("status"));
                         sharedPreferences.setEmail(d.getString("email"));
                         sharedPreferences.saveUser(new User(d.getString("name"), phone, d.getString("pin"),
-                                d.getString("totalRent"),
-                                d.getString("totalRide"), true, d.getString("profileUrl"), d.getString("wallet")));
+                                d.getString("totalRentItem"),
+                                d.getString("totalRides"), true, d.getString("profileUrl"), d.getString("wallet")));
                     } else {
                         dialog.dismiss();
                         name = d.getString("name");
                         pin = d.getString("pin");
-                        totalRent = d.getString("totalRent");
-                        totalRide = d.getString("totalRide");
+                        totalRent = d.getString("totalRentItem");
+                        totalRide = d.getString("totalRides");
                         termsCheck = d.getBoolean("termsCheck");
                         profileUrl = d.getString("profileUrl");
                         profileImgPath = d.getString("profileImgPath");

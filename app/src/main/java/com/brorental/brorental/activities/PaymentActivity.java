@@ -313,7 +313,7 @@ public class PaymentActivity extends AppCompatActivity {
                                                                                                         if (task.isSuccessful()) {
                                                                                                             DocumentSnapshot d = task.getResult();
                                                                                                             long prevAmt = d.getLong("rentAmt");
-                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt);
+                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt) - 2500;
                                                                                                             HashMap<String, Object> map = new HashMap<>();
                                                                                                             map.put("rentAmt", amt);
                                                                                                             firestore.collection("appData").document("balance")
