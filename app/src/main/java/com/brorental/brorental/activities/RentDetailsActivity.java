@@ -102,9 +102,10 @@ public class RentDetailsActivity extends AppCompatActivity {
                             DialogCustoms.showSnackBar(RentDetailsActivity.this, "KYC not completed", binding.getRoot());
                             return;
                         }
-                        if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
-                            DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
-                        } else {
+//                        if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
+//                            DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
+//                        }
+                        else {
                             PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data, application);
                             sheet.show(getSupportFragmentManager(), PayBottomSheet.TAG);
                         }
@@ -153,8 +154,8 @@ public class RentDetailsActivity extends AppCompatActivity {
                             /** TODO make dynamic amount of rent item. */
                             Intent i = new Intent(getActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
-                            bundle.putString("amt", String.valueOf(rentAmt));
-//                            bundle.putString("amt", "1");
+//                            bundle.putString("amt", String.valueOf(rentAmt));
+                            bundle.putString("amt", "1");
                             bundle.putString("id", advertId);
                             bundle.putString("data", data.toString());
                             bundle.putString("rentStartDate", fromDate);
@@ -245,7 +246,6 @@ public class RentDetailsActivity extends AppCompatActivity {
             try {
                 long diffHours = TimeUnit.HOURS.convert(format.parse(newDate).getTime()
                         - format.parse(oldDate).getTime(), TimeUnit.MILLISECONDS);
-//                Log.d(TAG, "setPrice: " + diffHours);
                 if(diffHours < 0) {
                     DialogCustoms.showSnackBar(requireActivity(), "Invalid Date and Time", binding.getRoot());
                     return 0L;
