@@ -1,6 +1,5 @@
 package com.brorental.brorental;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
@@ -32,16 +30,18 @@ import com.brorental.brorental.activities.PaymentActivity;
 import com.brorental.brorental.activities.PaymentHistory;
 import com.brorental.brorental.activities.ProfileActivity;
 import com.brorental.brorental.activities.RideActivity;
-import com.brorental.brorental.activities.SignUpAndLogin;
 import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
 import com.brorental.brorental.models.RentItemModel;
+import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.Utility;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
         headerNameTV = headerView.findViewById(R.id.nameTV);
         headerWalletLL = headerView.findViewById(R.id.walletLL);
         Log.d(TAG, "onCreate: " + appClass.sharedPref.getUser().getTotalRent() + "\n" + appClass.sharedPref.getUser().getWallet());
-        long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
-        headerWalletTV.setText("\u20B9 " + wal);
+        headerWalletTV.setText("\u20B9 " + Utility.getTotalWallet(appClass));
         headerNameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
@@ -107,15 +106,26 @@ public class MainActivity extends AppCompatActivity {
         setListeners();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(MainActivity.this, appClass);
+        getData();
+
+        adapter = new RentListAdapter(this);
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        binding.recyclerView.setAdapter(adapter);
+        adapter.submitList(list);
+    }
+
+    private void getData() {
         if (Utility.isNetworkAvailable(this)) {
-            getData("", "");
+            getProfile();
+            queries("", "");
         } else {
             Snackbar bar = Snackbar.make(binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
             bar.setAction("Refresh", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (Utility.isNetworkAvailable(MainActivity.this)) {
-                        getData("", "");
+                        queries("", "");
+                        getProfile();
                         bar.dismiss();
                         Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                     } else {
@@ -127,11 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
             bar.show();
         }
-
-        adapter = new RentListAdapter(this);
-        binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        binding.recyclerView.setAdapter(adapter);
-        adapter.submitList(list);
     }
 
     private void setListeners() {
@@ -232,12 +237,12 @@ public class MainActivity extends AppCompatActivity {
         binding.swipeRef.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getData("", "");
+                getData();
             }
         });
     }
 
-    public void getData(String selectedState, String category) {
+    public void queries(String selectedState, String category) {
         Log.d(TAG, "getData: " + selectedState + "," + category);
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
@@ -286,10 +291,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult: 44");
         switch (reqCode) {
             case 101:
-                long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                headerWalletTV.setText(Utility.rupeeIcon + wal);
+                headerWalletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
                 headerNameTV.setText(appClass.sharedPref.getUser().getName());
                 Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
+                getProfile();
                 break;
             default:
                 break;
@@ -299,5 +304,32 @@ public class MainActivity extends AppCompatActivity {
     public void startActivityForRes(Intent i) {
         if (!isFinishing())
             startActivityForResult(i, 101);
+    }
+
+    private void getProfile() {
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot d) {
+                        appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
+                                d.getString("totalRentItem"), d.getString("totalRides"), true,
+                                d.getString("profileUrl"), d.getString("wallet")));
+                        appClass.sharedPref.setAadhaarImg(d.getString("aadhaarImgUrl"));
+                        appClass.sharedPref.setAadhaarPath(d.getString("aadhaarImgPath"));
+                        appClass.sharedPref.setDLImg(d.getString("drivingLicenseImg"));
+                        appClass.sharedPref.setDLPath(d.getString("drivingLicImgPath"));
+                        appClass.sharedPref.setProfilePath(d.getString("profileImgPath"));
+                        appClass.sharedPref.setStatus(d.getString("status"));
+                        onActivityResult(101, RESULT_OK, null);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure: " + e);
+                        if (!Utility.isNetworkAvailable(MainActivity.this)) {
+                            getProfile();
+                        }
+                    }
+                });
     }
 }

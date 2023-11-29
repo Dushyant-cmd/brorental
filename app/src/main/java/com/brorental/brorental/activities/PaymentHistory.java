@@ -54,8 +54,7 @@ public class PaymentHistory extends AppCompatActivity {
         adapter = new PaymentAdapter(this);
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
-        binding.walletTV.setText(Utility.rupeeIcon + wal);
+        binding.walletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
         pDialog = ProgressDialog.createAlertDialog(PaymentHistory.this);
         setListeners();
         getData();
@@ -63,7 +62,7 @@ public class PaymentHistory extends AppCompatActivity {
 
     private void getData() {
         if (Utility.isNetworkAvailable(this)) {
-            getTransactions();
+            queries();
         } else {
             Snackbar bar = Snackbar.make(binding.getRoot(), "No Connection", Snackbar.LENGTH_INDEFINITE);
             bar.setAction("connect", new View.OnClickListener() {
@@ -90,28 +89,82 @@ public class PaymentHistory extends AppCompatActivity {
             Button cancelBtn = view.findViewById(R.id.cancelRec);
             EditText rechargeET = view.findViewById(R.id.rechargeAmt);
             submitBtn.setOnClickListener(v -> {
-                wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                pDialog.show();
-                appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
-                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    appClass.sharedPref.setTotalRentItem(task.getResult().getString("totalRentItem"));
-                                    long ttlRentItem = Long.parseLong(appClass.sharedPref.getUser().getTotalRent());
-                                    long holdSecDep = (2500 * ttlRentItem);
-                                    long amt = Long.parseLong(rechargeET.getText().toString());
-                                    if (!String.valueOf(amt).isEmpty() && amt > 0) {
-                                        if (ttlRentItem > 0) {
-                                            if (wal > holdSecDep)
-                                                wal = wal - holdSecDep;
-                                            if (amt <= wal) {
-                                                long acWal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                if (!rechargeET.getText().toString().isEmpty()) {
+                    long amt = Long.parseLong(rechargeET.getText().toString());
+                    wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
+                    pDialog.show();
+                    appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        appClass.sharedPref.setTotalRentItem(task.getResult().getString("totalRentItem"));
+                                        long ttlRentItem = Long.parseLong(appClass.sharedPref.getUser().getTotalRent());
+                                        long holdSecDep = (2500 * ttlRentItem);
+                                        if (amt > 0 && Utility.getTotalWallet(appClass) > 0) {
+                                            if (holdSecDep > 0) {
+                                                if (amt <= wal) {
+                                                    String newWalAmt = "";
+                                                    newWalAmt = String.valueOf(wal - amt);
+                                                    HashMap<String, Object> map1 = new HashMap<>();
+                                                    map1.put("wallet", newWalAmt);
+                                                    String finalNewWalAmt = newWalAmt;
+                                                    appClass.firestore.collection("users")
+                                                            .document(appClass.sharedPref.getUser().getPin())
+                                                            .update(map1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        appClass.sharedPref.setWallet(finalNewWalAmt);
+                                                                        HashMap<String, Object> map = new HashMap<>();
+                                                                        map.put("amount", String.valueOf(amt));
+                                                                        map.put("date", Utility.getCurrDateAndTime(PaymentHistory.this));
+                                                                        map.put("info", null);
+                                                                        map.put("name", appClass.sharedPref.getUser().getName());
+                                                                        map.put("status", "pending");
+                                                                        map.put("type", "withdraw");
+                                                                        map.put("advertisementId", "");
+                                                                        map.put("timestamp", System.currentTimeMillis());
+                                                                        map.put("isBroRental", false);
+                                                                        map.put("broRentalId", appClass.sharedPref.getUser().getPin());
+                                                                        map.put("broPartnerId", "");
+                                                                        appClass.firestore.collection("transactions")
+                                                                                .add(map).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                                                        if (task.isSuccessful()) {
+                                                                                            sheet.dismiss();
+                                                                                            pDialog.dismiss();
+                                                                                            binding.walletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
+                                                                                            getData();
+                                                                                            Toast.makeText(PaymentHistory.this, "Withdrawal Successfully", Toast.LENGTH_SHORT).show();
+//                                                                                            DialogCustoms.showSnackBar(PaymentHistory.this, "Withdrawal Successfully", view.getRootView());
+                                                                                        } else {
+                                                                                            pDialog.dismiss();
+                                                                                            sheet.dismiss();
+                                                                                            DialogCustoms.showSnackBar(PaymentHistory.this, "Please check internet and try again", view.getRootView());
+                                                                                            Log.d(TAG, "onComplete: " + task.getException());
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                    } else {
+                                                                        pDialog.dismiss();
+                                                                        Toast.makeText(appClass, "Please try again later.", Toast.LENGTH_SHORT).show();
+                                                                        Log.d(TAG, "onComplete: " + task.getException());
+                                                                    }
+                                                                }
+                                                            });
+                                                } else {
+                                                    pDialog.dismiss();
+                                                    Toast.makeText(appClass, "Can't withdraw security deposit", Toast.LENGTH_SHORT).show();
+//                                                    DialogCustoms.showSnackBar(PaymentHistory.this, "Can't withdraw security deposit", view.getRootView());
+                                                }
+                                            } else {
                                                 String newWalAmt = "";
-                                                if (amt > acWal)
-                                                    newWalAmt = String.valueOf(acWal - amt);
+                                                if (amt > wal)
+                                                    newWalAmt = String.valueOf(amt - wal);
                                                 else
-                                                    newWalAmt = String.valueOf(amt - acWal);
+                                                    newWalAmt = String.valueOf(wal - amt);
                                                 HashMap<String, Object> map1 = new HashMap<>();
                                                 map1.put("wallet", newWalAmt);
                                                 String finalNewWalAmt = newWalAmt;
@@ -141,91 +194,38 @@ public class PaymentHistory extends AppCompatActivity {
                                                                                     if (task.isSuccessful()) {
                                                                                         sheet.dismiss();
                                                                                         pDialog.dismiss();
-                                                                                        long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                                                                                        binding.walletTV.setText(Utility.rupeeIcon + wal);
+                                                                                        binding.walletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
                                                                                         getData();
-                                                                                        DialogCustoms.showSnackBar(PaymentHistory.this, "Withdrawal Successfully", binding.getRoot());
+                                                                                        Toast.makeText(PaymentHistory.this, "Withdrawal Successfully", Toast.LENGTH_SHORT).show();
+//                                                                                        DialogCustoms.showSnackBar(PaymentHistory.this, "Withdrawal Successfully", view.getRootView());
                                                                                     } else {
                                                                                         pDialog.dismiss();
                                                                                         sheet.dismiss();
-                                                                                        DialogCustoms.showSnackBar(PaymentHistory.this, "Please check internet and try again", binding.getRoot());
+                                                                                        DialogCustoms.showSnackBar(PaymentHistory.this, "Please check internet and try again", view.getRootView());
                                                                                         Log.d(TAG, "onComplete: " + task.getException());
                                                                                     }
                                                                                 }
                                                                             });
                                                                 } else {
                                                                     pDialog.dismiss();
+                                                                    sheet.dismiss();
                                                                     Toast.makeText(appClass, "Please try again later.", Toast.LENGTH_SHORT).show();
                                                                     Log.d(TAG, "onComplete: " + task.getException());
                                                                 }
                                                             }
                                                         });
-                                            } else {
-                                                pDialog.dismiss();
-                                                DialogCustoms.showSnackBar(PaymentHistory.this, "Can't withdraw deposit", binding.getRoot());
                                             }
-                                        } else if (ttlRentItem == 0 && amt < wal) {
-                                            String newWalAmt = (wal - amt) + "";
-                                            HashMap<String, Object> map1 = new HashMap<>();
-                                            map1.put("wallet", newWalAmt);
-                                            appClass.firestore.collection("users")
-                                                    .document(appClass.sharedPref.getUser().getPin())
-                                                    .update(map1).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                appClass.sharedPref.setWallet(newWalAmt);
-                                                                HashMap<String, Object> map = new HashMap<>();
-                                                                map.put("amount", String.valueOf(amt));
-                                                                map.put("date", Utility.getCurrDateAndTime(PaymentHistory.this));
-                                                                map.put("info", null);
-                                                                map.put("name", appClass.sharedPref.getUser().getName());
-                                                                map.put("status", "pending");
-                                                                map.put("type", "withdraw");
-                                                                map.put("advertisementId", "");
-                                                                map.put("timestamp", System.currentTimeMillis());
-                                                                map.put("isBroRental", false);
-                                                                map.put("broRentalId", appClass.sharedPref.getUser().getPin());
-                                                                map.put("broPartnerId", "");
-                                                                appClass.firestore.collection("transactions")
-                                                                        .add(map).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                                                            @Override
-                                                                            public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                                                if (task.isSuccessful()) {
-                                                                                    sheet.dismiss();
-                                                                                    pDialog.dismiss();
-                                                                                    long wal = (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                                                                                    binding.walletTV.setText(Utility.rupeeIcon + wal);
-                                                                                    getData();
-                                                                                    DialogCustoms.showSnackBar(PaymentHistory.this, "Withdrawal Successfully", binding.getRoot());
-                                                                                } else {
-                                                                                    pDialog.dismiss();
-                                                                                    sheet.dismiss();
-                                                                                    DialogCustoms.showSnackBar(PaymentHistory.this, "Please check internet and try again", binding.getRoot());
-                                                                                    Log.d(TAG, "onComplete: " + task.getException());
-                                                                                }
-                                                                            }
-                                                                        });
-                                                            } else {
-                                                                pDialog.dismiss();
-                                                                Toast.makeText(appClass, "Please try again later.", Toast.LENGTH_SHORT).show();
-                                                                Log.d(TAG, "onComplete: " + task.getException());
-                                                            }
-                                                        }
-                                                    });
                                         } else {
-                                            DialogCustoms.showSnackBar(PaymentHistory.this, "Balance is too low.", binding.getRoot());
+                                            Toast.makeText(appClass, "Invalid withdraw", Toast.LENGTH_SHORT).show();
                                             pDialog.dismiss();
                                         }
                                     } else {
+                                        sheet.dismiss();
                                         pDialog.dismiss();
-                                        DialogCustoms.showSnackBar(PaymentHistory.this, "Enter valid amount.", binding.getRoot());
                                     }
-                                } else {
-                                    pDialog.dismiss();
                                 }
-                            }
-                        });
+                            });
+                }
             });
 
             cancelBtn.setOnClickListener(v -> sheet.dismiss());
@@ -240,12 +240,13 @@ public class PaymentHistory extends AppCompatActivity {
         binding.swipeRef.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getTransactions();
+                queries();
             }
         });
     }
 
-    private void getTransactions() {
+    private void queries() {
+        //tranactions
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         appClass.firestore.collection("transactions").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())

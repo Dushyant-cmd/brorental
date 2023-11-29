@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.room.Room;
 
 import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
@@ -23,7 +21,6 @@ import com.brorental.brorental.adapters.HintAdapter;
 import com.brorental.brorental.databinding.FragmentSearchBinding;
 import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.localdb.RoomDb;
-import com.brorental.brorental.localdb.SharedPref;
 import com.brorental.brorental.localdb.StateEntity;
 import com.brorental.brorental.retrofit.ApiService;
 import com.brorental.brorental.retrofit.RetrofitClient;
@@ -41,7 +38,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import okhttp3.RequestBody;
@@ -62,6 +58,7 @@ public class SearchFragment extends Fragment {
     private List<StateEntity> roomList = new ArrayList<>();
     private ApiService apiService;
     private RoomDb roomDb;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,7 +79,7 @@ public class SearchFragment extends Fragment {
             if (roomList.isEmpty())
                 getState();
             else {
-                for(int i=0; i<roomList.size(); i++) {
+                for (int i = 0; i < roomList.size(); i++) {
                     stateList.add(roomList.get(i).getState());
                 }
                 arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, stateList);
@@ -104,7 +101,7 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 int catePosition = Arrays.asList(cateArr).indexOf(query.trim());
                 Log.d(TAG, "onQueryTextSubmit: " + catePosition);
-                if(catePosition < 0) {
+                if (catePosition < 0) {
                     DialogCustoms.showSnackBar(getActivity(), "Select Valid Category", binding.getRoot());
                 } else
                     adapter.refreshInterface.refresh(catePosition);
@@ -133,10 +130,11 @@ public class SearchFragment extends Fragment {
             /**Below method will refresh list on MainActivity */
             @Override
             public void refresh(int catePosition) {
-                if(!stateList.isEmpty()) {
+                if (!stateList.isEmpty()) {
                     try {
-                        MainActivity hostAct = (MainActivity) getActivity();
-                        hostAct.getData(binding.spinner.getSelectedItem().toString().toLowerCase(), hintList.get(catePosition).toLowerCase());
+                        MainActivity hostAct = (MainActivity) requireActivity();
+                        if (!hostAct.isFinishing())
+                            hostAct.queries(binding.spinner.getSelectedItem().toString().toLowerCase(), hintList.get(catePosition).toLowerCase());
                         appClass.sharedPref.setState((String) binding.spinner.getSelectedItem());
                         Utility.hideKeyboardFrom(getActivity(), getContext(), binding.getRoot(), true);
                         hostAct.getSupportFragmentManager().popBackStackImmediate();
@@ -218,6 +216,7 @@ public class SearchFragment extends Fragment {
             Log.d(TAG, "getStates: " + e);
         }
     }
+
     private void noNetworkDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
@@ -230,7 +229,7 @@ public class SearchFragment extends Fragment {
                     if (roomList.isEmpty())
                         getState();
                     else {
-                        for(int i=0; i<roomList.size(); i++) {
+                        for (int i = 0; i < roomList.size(); i++) {
                             stateList.add(roomList.get(i).getState());
                         }
                         arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, stateList);

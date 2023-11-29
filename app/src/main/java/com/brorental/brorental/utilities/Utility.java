@@ -89,4 +89,13 @@ public class Utility {
         String dateAndTime = spf.format(date);
         return dateAndTime;
     }
+
+    public static long getTotalWallet(AppClass appClass) {
+        try {
+            return (Long.parseLong(appClass.sharedPref.getUser().getTotalRent()) * 2500) + Long.parseLong(appClass.sharedPref.getUser().getWallet());
+        } catch (Exception e) {
+            Log.d(TAG, "getTotalWallet: " + e);
+        }
+        return 0L;
+    }
 }

@@ -1,5 +1,6 @@
 package com.brorental.brorental.activities;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -43,6 +44,7 @@ public class RentDetailsActivity extends AppCompatActivity {
     private String TAG = "RentDetailsActivity.java";
     private AppClass application;
     private SharedPref sharedPref;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class RentDetailsActivity extends AppCompatActivity {
         application = (AppClass) getApplication();
         //REGISTER BROADCAST RECEIVER FOR INTERNET
         Utility.registerConnectivityBR(RentDetailsActivity.this, application);
+        activity = RentDetailsActivity.this;
         sharedPref = application.sharedPref;
         setSupportActionBar(binding.toolbar);
         getData();
@@ -146,7 +149,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     try {
-                        if (binding.totalAmtV.getText().toString().matches("\u20B9 0"))
+                        if (rentAmt <= 0)
                             DialogCustoms.showSnackBar(getActivity(), "Minimum rent for 1 hour", binding.getRoot());
                         else if (fromDate.isEmpty() && toDate.isEmpty())
                             DialogCustoms.showSnackBar(getActivity(), "Please select date", binding.getRoot());
@@ -155,6 +158,7 @@ public class RentDetailsActivity extends AppCompatActivity {
                             Intent i = new Intent(getActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
 //                            bundle.putString("amt", String.valueOf(rentAmt));
+                            bundle.putLong("rentCost", (hours * Long.parseLong(perHourCharge)));
                             bundle.putString("amt", "1");
                             bundle.putString("id", advertId);
                             bundle.putString("data", data.toString());
@@ -246,19 +250,26 @@ public class RentDetailsActivity extends AppCompatActivity {
             try {
                 long diffHours = TimeUnit.HOURS.convert(format.parse(newDate).getTime()
                         - format.parse(oldDate).getTime(), TimeUnit.MILLISECONDS);
-                if(diffHours < 0) {
+                if (diffHours < 0) {
                     DialogCustoms.showSnackBar(requireActivity(), "Invalid Date and Time", binding.getRoot());
                     return 0L;
                 }
-
-                binding.extraAmtTV.setText("\u20B9 " + extraCharge + " /hour");
-                binding.textLL.setVisibility(View.VISIBLE);
                 long wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
                 rentAmt = (diffHours * Long.parseLong(perHourCharge));
-                rentAmt = ((rentAmt - wal) + 2500);
-                binding.totalAmtV.setText(Utility.rupeeIcon + (2500 + rentAmt));
-                binding.tvSecDep.setText("Security deposit: +" + Utility.rupeeIcon + 2500);
-                binding.walletTV.setText("Wallet amount: -" + Utility.rupeeIcon + wal);
+                if (rentAmt > 0) {
+                    binding.extraAmtTV.setText("\u20B9 " + extraCharge + " /hour");
+                    binding.textLL.setVisibility(View.VISIBLE);
+                    binding.rentCostTv.setText("Rent cost: " + Utility.rupeeIcon + rentAmt);
+                    if (wal > rentAmt)
+                        rentAmt = 2500;
+                    else
+                        rentAmt = ((rentAmt - wal) + 2500);
+                    binding.totalAmtV.setText(Utility.rupeeIcon + rentAmt);
+                    binding.tvSecDep.setText("Security deposit: +" + Utility.rupeeIcon + 2500);
+                    binding.walletTV.setText("Wallet amount: -" + Utility.rupeeIcon + wal);
+                } else {
+                    DialogCustoms.showSnackBar(requireContext(), "Minimum rent for 1 hour", binding.getRoot());
+                }
                 return diffHours;
             } catch (Exception e) {
                 e.printStackTrace();

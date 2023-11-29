@@ -10,15 +10,15 @@
 
         <View
             android:layout_width="60dp"
-            android:layout_gravity="center_horizontal"
             android:layout_height="2dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="#C6BABA"/>
+            android:background="#C6BABA" />
 
         <androidx.cardview.widget.CardView
-            android:layout_marginTop="@dimen/_8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8dp"
             app:cardBackgroundColor="#FDF8F8"
             app:cardCornerRadius="8dp">
 
@@ -85,37 +85,47 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_8dp"
                     android:orientation="vertical"
-                    tools:visibility="visible"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:id="@+id/tv_sec_dep"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="@dimen/_8dp"
                             android:text="Security deposit: + \u20b9 2500"
-                            android:theme="@style/textStyle"
-                            android:layout_marginTop="@dimen/_8dp"
-                            android:layout_alignParentEnd="true"
-                            android:id="@+id/tv_sec_dep"/>
+                            android:theme="@style/textStyle" />
 
                         <TextView
-                            android:layout_below="@id/tv_sec_dep"
+                            android:id="@+id/walletTV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Wallet amount: - \u20b9 500"
-                            android:theme="@style/textStyle"
-                            android:layout_marginTop="@dimen/_8dp"
+                            android:layout_below="@id/tv_sec_dep"
                             android:layout_alignParentEnd="true"
-                            android:id="@+id/walletTV"/>
+                            android:layout_marginTop="@dimen/_8dp"
+                            android:text="Wallet amount: - \u20b9 500"
+                            android:theme="@style/textStyle" />
 
                         <TextView
+                            android:id="@+id/rentCostTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_below="@id/walletTV"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="@dimen/_8dp"
+                            android:text="Rent cost: \u20b9 500"
+                            android:theme="@style/textStyle" />
+
+                        <TextView
                             android:id="@+id/totalHeadTV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_below="@id/rentCostTv"
                             android:layout_marginTop="@dimen/_8dp"
                             android:fontFamily="@font/monserrat_semibold"
                             android:text="Total Rent Cost:"
@@ -123,10 +133,10 @@
                             android:theme="@style/textStyle" />
 
                         <TextView
-                            android:layout_below="@id/walletTV"
                             android:id="@+id/totalAmtV"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_below="@id/rentCostTv"
                             android:layout_alignParentEnd="true"
                             android:layout_marginTop="@dimen/_8dp"
                             android:fontFamily="@font/monserrat_semibold"

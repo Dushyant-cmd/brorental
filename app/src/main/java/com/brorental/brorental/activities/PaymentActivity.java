@@ -42,6 +42,7 @@ import java.util.UUID;
 
 public class PaymentActivity extends AppCompatActivity {
     FirebaseFirestore firestore;
+    private long rentCost = 0L;
     private boolean isAddCash = false, isRidePayment = false, isRentPayment = false;
     SharedPref sharedPreferences;
     String rechargeAmt, advertId = "", broPartnerId = "", rentStart, rentEnd, hours;
@@ -72,6 +73,7 @@ public class PaymentActivity extends AppCompatActivity {
                 hours = String.valueOf(bundle.getLong("hours"));
                 rentStart = bundle.getString("rentStartDate");
                 rentEnd = bundle.getString("rentEndDate");
+                rentCost = bundle.getLong("rentCost");
                 isRentPayment = true;
             } else if (getIntent().hasExtra("addCash")) {
                 isAddCash = true;
@@ -221,12 +223,13 @@ public class PaymentActivity extends AppCompatActivity {
                 Log.v(tag, dateAndTime);
                 if (transactionAmt != null) {
                     long currentUserBalance = Long.parseLong(sharedPreferences.getUser().getWallet());
-                    long updatedBalance;
-                    if (isRentPayment || isRentPayment)
-                        updatedBalance = currentUserBalance - Long.parseLong(transactionAmt);
-                    else
+                    long updatedBalance = 0;
+                    if (isRentPayment && !(rentCost > currentUserBalance)) {
+                            updatedBalance = currentUserBalance - rentCost;
+                    } else if (isAddCash)
                         updatedBalance = currentUserBalance + Long.parseLong(transactionAmt);
 
+                    long finalUpdatedBalance = updatedBalance;
                     firestore.collection("users")
                             .document(appClass.sharedPref.getUser().getPin()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
@@ -235,13 +238,14 @@ public class PaymentActivity extends AppCompatActivity {
                                         long totalRentItem = Long.parseLong(task.getResult().getString("totalRentItem")) + 1;
                                         //Map interface subclass instance contains value object in key-value pair where key must be a String.
                                         HashMap<String, Object> map = new HashMap<>();
-                                        map.put("wallet", String.valueOf(updatedBalance));
-                                        map.put("totalRentItem", String.valueOf(totalRentItem));
+                                        map.put("wallet", String.valueOf(finalUpdatedBalance));
+                                        if (isRentPayment && totalRentItem > 0)
+                                            map.put("totalRentItem", String.valueOf(totalRentItem));
                                         firestore.collection("users").document(sharedPreferences.getUser().getPin() + "").update(map)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void unused) {
-                                                        sharedPreferences.setWallet(String.valueOf(updatedBalance));
+                                                        sharedPreferences.setWallet(String.valueOf(finalUpdatedBalance));
                                                         HashMap<String, Object> map = new HashMap<>();
                                                         map.put("amount", transactionAmt);
                                                         map.put("date", dateAndTime);
@@ -289,50 +293,35 @@ public class PaymentActivity extends AppCompatActivity {
                                                                                 @Override
                                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                                     if (task.isSuccessful()) {
-                                                                                        long wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
-                                                                                        long dedWal = wal - (Long.parseLong(rechargeAmt) - 2500);
-                                                                                        String newWalAmt = String.valueOf(dedWal);
-                                                                                        HashMap<String, Object> userMap = new HashMap<>();
-                                                                                        userMap.put("wallet", newWalAmt);
-                                                                                        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
-                                                                                                .update(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                    @Override
-                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                        if (task.isSuccessful()) {
-                                                                                                            appClass.sharedPref.setWallet(newWalAmt);
-                                                                                                        } else {
-                                                                                                            Log.d(TAG, "onComplete: " + task.getException());
-                                                                                                        }
-                                                                                                    }
-                                                                                                });
-
-                                                                                        appClass.firestore.collection("appData").document("balance")
-                                                                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                                    @Override
-                                                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                                        if (task.isSuccessful()) {
-                                                                                                            DocumentSnapshot d = task.getResult();
-                                                                                                            long prevAmt = d.getLong("rentAmt");
-                                                                                                            long amt = prevAmt + Long.parseLong(rechargeAmt) - 2500;
-                                                                                                            HashMap<String, Object> map = new HashMap<>();
-                                                                                                            map.put("rentAmt", amt);
-                                                                                                            firestore.collection("appData").document("balance")
-                                                                                                                    .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                        @Override
-                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                            if (task.isSuccessful()) {
-                                                                                                                                Log.v(tag, "success");
-                                                                                                                                Toast.makeText(getApplicationContext(), "Transaction done successfully", Toast.LENGTH_LONG).show();
-                                                                                                                            } else {
-                                                                                                                                Log.d(TAG, "onComplete: " + task.getException());
+                                                                                        if (isRentPayment) {
+                                                                                            appClass.firestore.collection("appData").document("balance")
+                                                                                                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                                        @Override
+                                                                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                            if (task.isSuccessful()) {
+                                                                                                                DocumentSnapshot d = task.getResult();
+                                                                                                                long prevAmt = d.getLong("rentAmt");
+                                                                                                                long amt = prevAmt + rentCost;
+                                                                                                                HashMap<String, Object> map = new HashMap<>();
+                                                                                                                map.put("rentAmt", amt);
+                                                                                                                firestore.collection("appData").document("balance")
+                                                                                                                        .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                            @Override
+                                                                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                                if (task.isSuccessful()) {
+                                                                                                                                    Log.v(tag, "success");
+                                                                                                                                    Toast.makeText(getApplicationContext(), "Transaction done successfully", Toast.LENGTH_LONG).show();
+                                                                                                                                } else {
+                                                                                                                                    Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                                                }
                                                                                                                             }
-                                                                                                                        }
-                                                                                                                    });
-                                                                                                        } else {
-                                                                                                            Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                                        });
+                                                                                                            } else {
+                                                                                                                Log.d(TAG, "onComplete: " + task.getException());
+                                                                                                            }
                                                                                                         }
-                                                                                                    }
-                                                                                                });
+                                                                                                    });
+                                                                                        }
                                                                                     } else {
                                                                                         Log.d(TAG, "onComplete: " + task.getException());
                                                                                     }
