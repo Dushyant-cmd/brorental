@@ -10,4 +10,5 @@
     <color name="placeholder_bg">#ECECEC</color>
     <color name="purple_500">#9FC13B</color>
     <color name="teal_200">#33AB51</color>
+    <color name="red">#FF1100</color>
 </resources>

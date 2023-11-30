@@ -246,10 +246,13 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "getData: " + selectedState + "," + category);
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
-        Query query = mFirestore.collection("rent").limit(10);
+        Query query = mFirestore.collection("rent")
+                .orderBy("timestamp", Query.Direction.DESCENDING);
         if (!selectedState.isEmpty()) {
             query = mFirestore.collection("rent").whereEqualTo("state", selectedState)
-                    .whereEqualTo("category", category).limit(10);
+                    .whereEqualTo("category", category)
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(10);
         }
         query.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

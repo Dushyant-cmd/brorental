@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -102,13 +103,9 @@ public class RentDetailsActivity extends AppCompatActivity {
                     //terms & conditions with a complete payment button.
                     try {
                         if (sharedPref.getStatus().matches("pending")) {
-                            DialogCustoms.showSnackBar(RentDetailsActivity.this, "KYC not completed", binding.getRoot());
-                            return;
-                        }
-//                        if (Long.parseLong(sharedPref.getUser().getWallet()) < 2500) {
-//                            DialogCustoms.showSnackBar(RentDetailsActivity.this, "Balance must be 2500 Rs.", binding.getRoot());
-//                        }
-                        else {
+                            DialogCustoms.noKycDialog(RentDetailsActivity.this, RentDetailsActivity.this, application);
+                            Toast.makeText(RentDetailsActivity.this, "Upload Profile.", Toast.LENGTH_SHORT).show();
+                        } else {
                             PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data, application);
                             sheet.show(getSupportFragmentManager(), PayBottomSheet.TAG);
                         }
@@ -150,12 +147,12 @@ public class RentDetailsActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     try {
                         if (rentAmt <= 0)
-                            DialogCustoms.showSnackBar(getActivity(), "Minimum rent for 1 hour", binding.getRoot());
+                            DialogCustoms.showSnackBar(requireActivity(), "Minimum rent for 1 hour", binding.getRoot());
                         else if (fromDate.isEmpty() && toDate.isEmpty())
-                            DialogCustoms.showSnackBar(getActivity(), "Please select date", binding.getRoot());
+                            DialogCustoms.showSnackBar(requireActivity(), "Please select date", binding.getRoot());
                         else {
                             /** TODO make dynamic amount of rent item. */
-                            Intent i = new Intent(getActivity(), PaymentActivity.class);
+                            Intent i = new Intent(requireActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
 //                            bundle.putString("amt", String.valueOf(rentAmt));
                             bundle.putLong("rentCost", (hours * Long.parseLong(perHourCharge)));

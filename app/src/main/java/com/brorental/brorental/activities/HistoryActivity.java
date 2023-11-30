@@ -2,6 +2,7 @@ package com.brorental.brorental.activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -13,6 +14,7 @@ import com.brorental.brorental.databinding.ActivityHistoryBinding;
 import com.brorental.brorental.fragments.RentHistoryFragment;
 import com.brorental.brorental.fragments.RideHistoryFragment;
 import com.brorental.brorental.utilities.AppClass;
+import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.Utility;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -49,6 +51,11 @@ public class HistoryActivity extends AppCompatActivity {
                 }
             }
         }).attach();
+
+        if (appClass.sharedPref.getStatus().matches("pending")) {
+            DialogCustoms.noKycDialog(HistoryActivity.this, HistoryActivity.this, appClass);
+            Toast.makeText(HistoryActivity.this, "Upload Profile.", Toast.LENGTH_SHORT).show();
+        }
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

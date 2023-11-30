@@ -29,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -250,6 +251,8 @@ public class PaymentHistory extends AppCompatActivity {
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         appClass.firestore.collection("transactions").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(10)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {

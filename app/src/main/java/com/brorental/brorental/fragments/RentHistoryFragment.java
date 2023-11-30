@@ -12,16 +12,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.activities.HistoryActivity;
 import com.brorental.brorental.adapters.RentHistoryAdapter;
 import com.brorental.brorental.databinding.FragmentRentHistoryBinding;
 import com.brorental.brorental.models.HistoryModel;
 import com.brorental.brorental.utilities.AppClass;
+import com.brorental.brorental.utilities.DialogCustoms;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -48,6 +52,7 @@ public class RentHistoryFragment extends Fragment {
                 getRentItems();
             }
         });
+
         getRentItems();
         return binding.getRoot();
     }
@@ -56,6 +61,8 @@ public class RentHistoryFragment extends Fragment {
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         appClass.firestore.collection("rentHistory").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(10)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
