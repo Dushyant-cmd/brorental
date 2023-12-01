@@ -154,7 +154,7 @@
             android:layout_marginHorizontal="@dimen/_8dp"
             android:layout_marginTop="@dimen/_8dp"
             android:backgroundTint="@color/primary"
-            android:text="Add Point"
+            android:text="Find a Ride"
             android:textColor="@color/white" />
     </LinearLayout>
 </layout>

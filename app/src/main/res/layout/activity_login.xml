@@ -50,38 +50,46 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/nextBtn"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/nextBtn"
-                android:focusableInTouchMode="false"
-                android:autoText="false"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="4dp"
-                android:layout_marginBottom="16dp">
+                android:layout_gravity="center"
+                android:layout_marginBottom="1dp"
+                android:background="@drawable/grey_border"
+                android:layout_height="match_parent">
 
-                <EditText
-                    android:autoText="false"
-                    android:focusableInTouchMode="false"
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="@dimen/_8dp"
+                    android:src="@drawable/indian_flag"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"/>
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+91"
-                    android:inputType="textFilter" />
-            </com.google.android.material.textfield.TextInputLayout>
-
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:layout_marginStart="@dimen/_8dp"
+                    android:layout_marginEnd="@dimen/_8dp"/>
+            </LinearLayout>
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_height="match_parent">
 
                 <EditText
                     android:id="@+id/eTMobileNumber"
                     android:maxLength="10"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:hint="Enter number"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>

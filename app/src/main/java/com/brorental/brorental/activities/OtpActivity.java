@@ -430,7 +430,7 @@ public class OtpActivity extends AppCompatActivity {
                                         if (task.isSuccessful()) {
                                             String pin = task.getResult().getString("broRentalPin");
                                             HashMap<String, Object> map = new HashMap<>();
-                                            map.put("broRentalPin", "" + Long.parseLong(pin) + 1);
+                                            map.put("broRentalPin", String.valueOf(Long.parseLong(pin) + 1));
                                             mFirestore.collection("ids").document("pins")
                                                     .update(map)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -450,28 +450,29 @@ public class OtpActivity extends AppCompatActivity {
                                                             map2.put("aadhaarImgPath", "");
                                                             map2.put("drivingLicenseImg", "");
                                                             map2.put("drivingLicImgPath", "");
+                                                            map2.put("wallet", "0");
                                                             map2.put("status", "pending");
                                                             mFirestore.collection("users")
                                                                     .document(pin).set(map2).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void unused) {
-                                                                            Intent i = new Intent(OtpActivity.this, MainActivity.class);
-                                                                            i.putExtra("phone", phone);//with +91 code in phone variable.
-                                                                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                            startActivity(i);
-                                                                            finish();
+//                                                                            Intent i = new Intent(OtpActivity.this, MainActivity.class);
+//                                                                            i.putExtra("phone", phone);//with +91 code in phone variable.
+//                                                                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                                                            startActivity(i);
+//                                                                            finish();
                                                                             dialog.dismiss();
-                                                                            sharedPreferences.setLogin(true);
-                                                                            sharedPreferences.setAadhaarImg("");
-                                                                            sharedPreferences.setAadhaarPath("");
-                                                                            sharedPreferences.setDLImg("");
-                                                                            sharedPreferences.setDLPath("");
-                                                                            sharedPreferences.setProfilePath("");
-                                                                            sharedPreferences.setStatus("pending");
-                                                                            sharedPreferences.setEmail("");
-                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, "", "0"));
+//                                                                            sharedPreferences.setLogin(true);
+//                                                                            sharedPreferences.setAadhaarImg("");
+//                                                                            sharedPreferences.setAadhaarPath("");
+//                                                                            sharedPreferences.setDLImg("");
+//                                                                            sharedPreferences.setDLPath("");
+//                                                                            sharedPreferences.setProfilePath("");
+//                                                                            sharedPreferences.setStatus("pending");
+//                                                                            sharedPreferences.setEmail("");
+//                                                                            sharedPreferences.saveUser(new User(username, phone, pin, "0", "0", false, "", "0"));
                                                                             binding.otpLl.setVisibility(View.GONE);
-                                                                            binding.otpLl.setVisibility(View.VISIBLE);
+                                                                            binding.termsLangLL.setVisibility(View.VISIBLE);
                                                                             Toast.makeText(OtpActivity.this, "Sign-Up", Toast.LENGTH_SHORT).show();
                                                                         }
                                                                     }).addOnFailureListener(new OnFailureListener() {

@@ -1,7 +1,9 @@
 package com.brorental.brorental;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -33,10 +36,12 @@ import com.brorental.brorental.activities.RideActivity;
 import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
+import com.brorental.brorental.models.HistoryModel;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.ProgressDialog;
 import com.brorental.brorental.utilities.Utility;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -64,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView headerWalletTV, viewProfileTV, headerNameTV;
     private ImageView headerImageView;
     private LinearLayout headerWalletLL;
+    private int page = 0;
+    private DocumentSnapshot lastDoc;
+    private AlertDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         appClass = (AppClass) getApplication();
         mFirestore = appClass.firestore;
+        pDialog = ProgressDialog.createAlertDialog(MainActivity.this);
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, 0, 0);
         mDrawerToggle.syncState();
         //After instantiating your ActionBarDrawerToggle
@@ -243,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void queries(String selectedState, String category) {
-        Log.d(TAG, "getData: " + selectedState + "," + category);
+//        Log.d(TAG, "getData: " + selectedState + "," + category);
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         Query query = mFirestore.collection("rent")
@@ -271,12 +280,66 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             adapter.notifyDataSetChanged();
+
+                            if(!docList.isEmpty())
+                                lastDoc = docList.get(docList.size() - 1);
+
+                            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
+                                binding.nestedSv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                                    @Override
+                                    public void onScrollChange(@NonNull NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                                        //Check if user scrolled till bottom
+                                        if (scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
+                                            Log.v(TAG, "list scroll till bottom");
+                                            if (Utility.isNetworkAvailable(MainActivity.this) && page == 0) {
+                                                page++;
+                                                loadMoreGameResult();
+                                            } else if(!Utility.isNetworkAvailable(MainActivity.this)) {
+                                                Toast.makeText(MainActivity.this, "Check internet connection", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                });
                             Log.d(TAG, "onComplete: " + docList.size());
                         } else {
                             Log.d(TAG, "onComplete: " + task.getException());
                         }
                     }
                 });
+    }
+
+    private void loadMoreGameResult() {
+        pDialog.show();
+        Query query = mFirestore.collection("rent")
+                .startAfter(lastDoc)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                page = 0;
+                pDialog.dismiss();
+                if(task.isSuccessful()) {
+                    List<DocumentSnapshot> dList = task.getResult().getDocuments();
+                    if(!dList.isEmpty()) {
+                        for(DocumentSnapshot d: dList) {
+                            RentItemModel model = d.toObject(RentItemModel.class);
+                            list.add(model);
+                        }
+
+                        if(!dList.isEmpty())
+                            lastDoc = dList.get(dList.size() - 1);
+
+                        adapter.submitList(list);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_SHORT).show();
+                        page++;
+                    }
+                } else {
+                    DialogCustoms.showSnackBar(MainActivity.this, "Please try again", binding.getRoot());
+                }
+            }
+        });
     }
 
     private void openFragment(SearchFragment searchFragment) {
@@ -291,9 +354,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent intent) {
         super.onActivityResult(reqCode, resCode, intent);
-        Log.d(TAG, "onActivityResult: 44");
         switch (reqCode) {
             case 101:
+                Log.d(TAG, "onActivityResult: 44");
                 headerWalletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
                 headerNameTV.setText(appClass.sharedPref.getUser().getName());
                 Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
@@ -329,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "onFailure: " + e);
-                        if (!Utility.isNetworkAvailable(MainActivity.this)) {
+                        if (Utility.isNetworkAvailable(MainActivity.this)) {
                             getProfile();
                         }
                     }

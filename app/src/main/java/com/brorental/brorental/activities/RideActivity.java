@@ -23,11 +23,13 @@ import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityRideBinding;
 import com.brorental.brorental.databinding.PointsBottomSheetBinding;
 import com.brorental.brorental.interfaces.UtilsInterface;
+import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
 import com.brorental.brorental.utilities.ProgressDialog;
 import com.brorental.brorental.utilities.Utility;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -45,6 +47,7 @@ public class RideActivity extends AppCompatActivity {
     private ActivityRideBinding binding;
     private String[] fromArr;
     private String[] toArr;
+    private boolean isReadyRide = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +58,23 @@ public class RideActivity extends AppCompatActivity {
         Utility.registerConnectivityBR(RideActivity.this, appClass);
         String status = appClass.sharedPref.getStatus();
         if(status.equalsIgnoreCase("pending")) {
-            DialogCustoms.noKycDialog(RideActivity.this, this, appClass);
+            DialogCustoms.noKycDialog(RideActivity.this, this, appClass, new UtilsInterface.NoKycInterface() {
+                @Override
+                public void refresh(androidx.appcompat.app.AlertDialog alertDialog) {
+                    getProfile(alertDialog);
+                }
+            });
             Toast.makeText(this, "Upload Profile.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        getData();
         setListeners();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getData();
     }
 
     private void getData() {
@@ -92,6 +105,7 @@ public class RideActivity extends AppCompatActivity {
                                 startActivity(i);
                             }
                         });
+                        sheet.setCancelable(false);
                         sheet.show(getSupportFragmentManager(), "add_ride");
                     }
                 });
@@ -111,6 +125,38 @@ public class RideActivity extends AppCompatActivity {
         });
     }
 
+
+    private void getProfile(androidx.appcompat.app.AlertDialog alertDialog) {
+        android.app.AlertDialog pDialog = ProgressDialog.createAlertDialog(RideActivity.this);
+        pDialog.show();
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot d) {
+                        pDialog.dismiss();
+                        appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
+                                d.getString("totalRentItem"), d.getString("totalRides"), true,
+                                d.getString("profileUrl"), d.getString("wallet")));
+                        appClass.sharedPref.setAadhaarImg(d.getString("aadhaarImgUrl"));
+                        appClass.sharedPref.setAadhaarPath(d.getString("aadhaarImgPath"));
+                        appClass.sharedPref.setDLImg(d.getString("drivingLicenseImg"));
+                        appClass.sharedPref.setDLPath(d.getString("drivingLicImgPath"));
+                        appClass.sharedPref.setProfilePath(d.getString("profileImgPath"));
+                        appClass.sharedPref.setStatus(d.getString("status"));
+                        onActivityResult(101, RESULT_OK, null);
+
+                        if(alertDialog != null)
+                            if(!appClass.sharedPref.getStatus().equalsIgnoreCase("pending")) {
+                                alertDialog.dismiss();
+                            }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pDialog.dismiss();
+                    }
+                });
+    }
     public static class RideSheet extends BottomSheetDialogFragment {
         private String TAG = "PointAddSheet.java";
         private Context ctx;
@@ -121,6 +167,7 @@ public class RideActivity extends AppCompatActivity {
         private String from, to;
         private long amt, dis;
         private UtilsInterface.RideInterface refreshListener;
+        private boolean isReadyRide = false;
         private AlertDialog pDialog;
 
         public RideSheet(AppClass appClass, String[] fromArr, String[] toArr, UtilsInterface.RideInterface refreshListener) {
@@ -182,10 +229,10 @@ public class RideActivity extends AppCompatActivity {
             });
 
             binding.btnAdd.setOnClickListener(view -> {
-                if (!from.toLowerCase().contains("select") && !to.toLowerCase().contains("select")) {
+                if (!from.toLowerCase().contains("select") && !to.toLowerCase().contains("select") && isReadyRide) {
                     checkAndAddRide();
                 } else {
-                    DialogCustoms.showSnackBar(ctx, "Select points", binding.getRoot());
+                    DialogCustoms.showSnackBar(ctx, "Please change pickup and destination.", binding.getRoot());
                 }
             });
         }
@@ -276,10 +323,14 @@ public class RideActivity extends AppCompatActivity {
 
                                     binding.tvRideAmt.setText("\u20b9 " + amt);
                                     binding.tvDis.setText(dis + " /km");
-                                } else
+                                    isReadyRide = true;
+                                } else {
                                     binding.textLL.setVisibility(View.GONE);
+                                    isReadyRide = false;
+                                }
                             } else {
                                 pDialog.dismiss();
+                                isReadyRide = false;
                                 DialogCustoms.showSnackBar(ctx, task.getException().getMessage(), binding.getRoot());
                             }
                         }

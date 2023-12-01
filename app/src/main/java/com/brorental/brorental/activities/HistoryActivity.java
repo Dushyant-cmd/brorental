@@ -1,9 +1,13 @@
 package com.brorental.brorental.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -13,16 +17,24 @@ import com.brorental.brorental.adapters.HistoryPagerAdapter;
 import com.brorental.brorental.databinding.ActivityHistoryBinding;
 import com.brorental.brorental.fragments.RentHistoryFragment;
 import com.brorental.brorental.fragments.RideHistoryFragment;
+import com.brorental.brorental.interfaces.UtilsInterface;
+import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.ProgressDialog;
 import com.brorental.brorental.utilities.Utility;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class HistoryActivity extends AppCompatActivity {
     private AppClass appClass;
     private ActivityHistoryBinding binding;
     private HistoryPagerAdapter viewPagerAdapter;
+    private String TAG = "HistoryActivity.java";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +65,12 @@ public class HistoryActivity extends AppCompatActivity {
         }).attach();
 
         if (appClass.sharedPref.getStatus().matches("pending")) {
-            DialogCustoms.noKycDialog(HistoryActivity.this, HistoryActivity.this, appClass);
+            DialogCustoms.noKycDialog(HistoryActivity.this, HistoryActivity.this, appClass, new UtilsInterface.NoKycInterface() {
+                @Override
+                public void refresh(AlertDialog alertDialog) {
+                    getProfile(alertDialog);
+                }
+            });
             Toast.makeText(HistoryActivity.this, "Upload Profile.", Toast.LENGTH_SHORT).show();
         }
 
@@ -63,5 +80,38 @@ public class HistoryActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+    }
+
+    private void getProfile(AlertDialog alertDialog) {
+        android.app.AlertDialog pDialog = ProgressDialog.createAlertDialog(HistoryActivity.this);
+        pDialog.show();
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot d) {
+                        pDialog.dismiss();
+                        appClass.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
+                                d.getString("totalRentItem"), d.getString("totalRides"), true,
+                                d.getString("profileUrl"), d.getString("wallet")));
+                        appClass.sharedPref.setAadhaarImg(d.getString("aadhaarImgUrl"));
+                        appClass.sharedPref.setAadhaarPath(d.getString("aadhaarImgPath"));
+                        appClass.sharedPref.setDLImg(d.getString("drivingLicenseImg"));
+                        appClass.sharedPref.setDLPath(d.getString("drivingLicImgPath"));
+                        appClass.sharedPref.setProfilePath(d.getString("profileImgPath"));
+                        appClass.sharedPref.setStatus(d.getString("status"));
+                        onActivityResult(101, RESULT_OK, null);
+
+                        if(alertDialog != null)
+                            if(!appClass.sharedPref.getStatus().equalsIgnoreCase("pending")) {
+                                alertDialog.dismiss();
+                            }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pDialog.dismiss();
+                        Log.d(TAG, "onFailure: " + e);
+                    }
+                });
     }
 }

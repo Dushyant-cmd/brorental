@@ -15,20 +15,27 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivityRentDetailsBinding;
 import com.brorental.brorental.databinding.PaymentBottomSheetBinding;
+import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.localdb.SharedPref;
+import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
+import com.brorental.brorental.utilities.ProgressDialog;
 import com.brorental.brorental.utilities.Utility;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.json.JSONObject;
 
@@ -103,7 +110,12 @@ public class RentDetailsActivity extends AppCompatActivity {
                     //terms & conditions with a complete payment button.
                     try {
                         if (sharedPref.getStatus().matches("pending")) {
-                            DialogCustoms.noKycDialog(RentDetailsActivity.this, RentDetailsActivity.this, application);
+                            DialogCustoms.noKycDialog(RentDetailsActivity.this, RentDetailsActivity.this, application, new UtilsInterface.NoKycInterface() {
+                                @Override
+                                public void refresh(AlertDialog alertDialog) {
+                                    getProfile(alertDialog);
+                                }
+                            });
                             Toast.makeText(RentDetailsActivity.this, "Upload Profile.", Toast.LENGTH_SHORT).show();
                         } else {
                             PayBottomSheet sheet = new PayBottomSheet(data.getString("advertisementId"), perHourCharge, extraCharge, data, application);
@@ -119,6 +131,39 @@ public class RentDetailsActivity extends AppCompatActivity {
         }
     }
 
+
+    private void getProfile(AlertDialog alertDialog) {
+        android.app.AlertDialog pDialog = ProgressDialog.createAlertDialog(RentDetailsActivity.this);
+        pDialog.show();
+        application.firestore.collection("users").document(application.sharedPref.getUser().getPin())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot d) {
+                        pDialog.dismiss();
+                        application.sharedPref.saveUser(new User(d.getString("name"), d.getString("mobile"), d.getString("pin"),
+                                d.getString("totalRentItem"), d.getString("totalRides"), true,
+                                d.getString("profileUrl"), d.getString("wallet")));
+                        application.sharedPref.setAadhaarImg(d.getString("aadhaarImgUrl"));
+                        application.sharedPref.setAadhaarPath(d.getString("aadhaarImgPath"));
+                        application.sharedPref.setDLImg(d.getString("drivingLicenseImg"));
+                        application.sharedPref.setDLPath(d.getString("drivingLicImgPath"));
+                        application.sharedPref.setProfilePath(d.getString("profileImgPath"));
+                        application.sharedPref.setStatus(d.getString("status"));
+                        onActivityResult(101, RESULT_OK, null);
+
+                        if(alertDialog != null)
+                            if(!application.sharedPref.getStatus().equalsIgnoreCase("pending")) {
+                                alertDialog.dismiss();
+                            }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pDialog.dismiss();
+                        Log.d(TAG, "onFailure: " + e);
+                    }
+                });
+    }
     public static class PayBottomSheet extends BottomSheetDialogFragment {
         public static String TAG = "PayBottomSheet.java";
         public String advertId = "", perHourCharge, extraCharge;
@@ -154,8 +199,8 @@ public class RentDetailsActivity extends AppCompatActivity {
                             /** TODO make dynamic amount of rent item. */
                             Intent i = new Intent(requireActivity(), PaymentActivity.class);
                             Bundle bundle = new Bundle();
-//                            bundle.putString("amt", String.valueOf(rentAmt));
                             bundle.putLong("rentCost", (hours * Long.parseLong(perHourCharge)));
+//                            bundle.putString("amt", String.valueOf(rentAmt));
                             bundle.putString("amt", "1");
                             bundle.putString("id", advertId);
                             bundle.putString("data", data.toString());
