@@ -121,11 +121,11 @@ public class RideHistoryFragment extends Fragment {
 
                                 @Override
                                 public void contactListener(String type) {
-                                    if(type.equalsIgnoreCase("phone")) {
+//                                    if(type.equalsIgnoreCase("phone")) {
                                         Intent i = new Intent(Intent.ACTION_DIAL);
                                         i.setData(Uri.parse("tel:" + appClass.sharedPref.getCustomerCareNum()));
                                         activity.startActivity(i);
-                                    }
+//                                    }
                                 }
                             });
 

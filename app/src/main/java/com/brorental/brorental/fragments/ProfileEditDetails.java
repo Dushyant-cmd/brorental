@@ -130,13 +130,20 @@ public class ProfileEditDetails extends Fragment {
 
                 HashMap<String, Object> map = new HashMap<>();
                 if (!altMob.isEmpty()) {
-                    if (Long.parseLong(String.valueOf(altMob.charAt(0))) >= 6 && altMob.length() > 9) {
-                        map.put("alternateMobile", altMob);
-                    } else {
-                        binding.altMobET.setError("Invalid");
+                    try {
+                        if (Long.parseLong(String.valueOf(altMob.charAt(0))) >= 6 && altMob.length() > 9) {
+                            map.put("alternateMobile", altMob);
+                        } else {
+                            binding.altMobET.setError("Invalid");
+                            binding.saveTV.setEnabled(true);
+                            dialog.dismiss();
+                            return;
+                        }
+                    } catch (NumberFormatException e) {
+                        binding.altMobET.setError("Remove special characters");
                         binding.saveTV.setEnabled(true);
                         dialog.dismiss();
-                        return;
+                        Log.d(TAG, "onClick: " + e);
                     }
                 }
 
@@ -162,8 +169,10 @@ public class ProfileEditDetails extends Fragment {
                             .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
+                                    if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null) {
                                         dialog.dismiss();
+                                    }
+                                    if (task.isSuccessful()) {
                                         if (!altMob.isEmpty())
                                             appClass.sharedPref.setAlternateMob(altMob);
                                         if (!name.isEmpty())
@@ -406,9 +415,10 @@ public class ProfileEditDetails extends Fragment {
                                 appClass.sharedPref.setDLPath(imagePath);
                             }
 
-                            dialog.dismiss();
-                            if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null)
+                            if (fileDLImage == null && fileAadhaarImage == null && fileProfileImage == null) {
+                                dialog.dismiss();
                                 requireActivity().onBackPressed();
+                            }
                             Log.d(TAG, "onComplete: success");
                         } else {
                             dialog.dismiss();

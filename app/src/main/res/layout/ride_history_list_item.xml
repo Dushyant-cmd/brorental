@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="@dimen/_15dp"
         app:cardElevation="0dp">

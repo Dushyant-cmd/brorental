@@ -153,12 +153,29 @@ public class SharedPref {
         sharedPreferences.edit().putLong("securityDeposit", status).apply();
     }
 
-    public void logout() {
-        sharedPreferences.edit().clear().apply();
-        sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
+
+    public long getPartnerRentCom() {
+        return sharedPreferences.getLong("partnerRentCommission", 0L);
+    }
+
+    public void setPartnerRentCom(long partnerRentCom) {
+        sharedPreferences.edit().putLong("partnerRentCommission", partnerRentCom).apply();
+    }
+
+    public long getPartnerRideCom() {
+        return sharedPreferences.getLong("partnerRideCommission", 0L);
+    }
+
+    public void setPartnerRideCom(long partnerRideCom) {
+        sharedPreferences.edit().putLong("partnerRideCommission", partnerRideCom).apply();
     }
 
     public void setTotalRentItem(String totalRentItem) {
-        sharedPreferences.edit().putString("totalRentItem", totalRentItem);
+        sharedPreferences.edit().putString("totalRentItem", totalRentItem).apply();
+    }
+
+    public void logout() {
+        sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
     }
 }

@@ -428,9 +428,9 @@ public class OtpActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
-                                            String pin = task.getResult().getString("broRentalPin");
+                                            pin = String.valueOf(Long.parseLong(task.getResult().getString("broRentalPin")) + 1);
                                             HashMap<String, Object> map = new HashMap<>();
-                                            map.put("broRentalPin", String.valueOf(Long.parseLong(pin) + 1));
+                                            map.put("broRentalPin", String.valueOf(pin));
                                             mFirestore.collection("ids").document("pins")
                                                     .update(map)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -462,6 +462,13 @@ public class OtpActivity extends AppCompatActivity {
 //                                                                            startActivity(i);
 //                                                                            finish();
                                                                             dialog.dismiss();
+                                                                            name = username;
+                                                                            totalRent = "0";
+                                                                            totalRide = "0";
+                                                                            termsCheck = false;
+                                                                            wallet = "0";
+                                                                            status = "pending";
+                                                                            email = "";
 //                                                                            sharedPreferences.setLogin(true);
 //                                                                            sharedPreferences.setAadhaarImg("");
 //                                                                            sharedPreferences.setAadhaarPath("");

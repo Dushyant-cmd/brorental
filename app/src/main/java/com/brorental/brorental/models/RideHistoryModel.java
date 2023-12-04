@@ -3,11 +3,11 @@ package com.brorental.brorental.models;
 import java.util.Objects;
 
 public class RideHistoryModel {
-    private String from, to, broPartnerId, broRentalId, paymentMode, status, profileUrl, name, docId;
+    private String from, to, broPartnerId, broRentalId, paymentMode, status, profileUrl, name, docId, pin, broPartnerMobile;
     private long amount, distance, startTimestamp, endTimestamp, timestamp, rideId;
 
 
-    public RideHistoryModel(String from, String to, String broPartnerId, String broRentalId, String paymentMode, String status, String profileUrl, String name, long amount, long distance, long startTimestamp, long endTimestamp, long timestamp, long rideId, String docId) {
+    public RideHistoryModel(String from, String to, String broPartnerId, String broRentalId, String paymentMode, String status, String profileUrl, String name, long amount, long distance, long startTimestamp, long endTimestamp, long timestamp, long rideId, String docId, String pin, String broPartnerMobile) {
         this.from = from;
         this.to = to;
         this.broPartnerId = broPartnerId;
@@ -23,6 +23,8 @@ public class RideHistoryModel {
         this.timestamp = timestamp;
         this.rideId = rideId;
         this.docId = docId;
+        this.pin = pin;
+        this.broPartnerMobile = broPartnerMobile;
     }
 
     @Override
@@ -30,12 +32,28 @@ public class RideHistoryModel {
         if (this == o) return true;
         if (!(o instanceof RideHistoryModel)) return false;
         RideHistoryModel that = (RideHistoryModel) o;
-        return getAmount() == that.getAmount() && getDistance() == that.getDistance() && getStartTimestamp() == that.getStartTimestamp() && getEndTimestamp() == that.getEndTimestamp() && getTimestamp() == that.getTimestamp() && getRideId() == that.getRideId() && Objects.equals(getFrom(), that.getFrom()) && Objects.equals(getTo(), that.getTo()) && Objects.equals(getBroPartnerId(), that.getBroPartnerId()) && Objects.equals(getBroRentalId(), that.getBroRentalId()) && Objects.equals(getPaymentMode(), that.getPaymentMode()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getProfileUrl(), that.getProfileUrl()) && Objects.equals(getName(), that.getName()) && Objects.equals(getDocId(), that.getDocId());
+        return getAmount() == that.getAmount() && getDistance() == that.getDistance() && getStartTimestamp() == that.getStartTimestamp() && getEndTimestamp() == that.getEndTimestamp() && getTimestamp() == that.getTimestamp() && getRideId() == that.getRideId() && Objects.equals(getFrom(), that.getFrom()) && Objects.equals(getTo(), that.getTo()) && Objects.equals(getBroPartnerId(), that.getBroPartnerId()) && Objects.equals(getBroRentalId(), that.getBroRentalId()) && Objects.equals(getPaymentMode(), that.getPaymentMode()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getProfileUrl(), that.getProfileUrl()) && Objects.equals(getName(), that.getName()) && Objects.equals(getDocId(), that.getDocId()) && Objects.equals(getPin(), that.getPin()) && Objects.equals(getBroPartnerMobile(), that.getBroPartnerMobile());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFrom(), getTo(), getBroPartnerId(), getBroRentalId(), getPaymentMode(), getStatus(), getProfileUrl(), getName(), getDocId(), getAmount(), getDistance(), getStartTimestamp(), getEndTimestamp(), getTimestamp(), getRideId());
+        return Objects.hash(getFrom(), getTo(), getBroPartnerId(), getBroRentalId(), getPaymentMode(), getStatus(), getProfileUrl(), getName(), getDocId(), getPin(), getBroPartnerMobile(), getAmount(), getDistance(), getStartTimestamp(), getEndTimestamp(), getTimestamp(), getRideId());
+    }
+
+    public String getBroPartnerMobile() {
+        return broPartnerMobile;
+    }
+
+    public void setBroPartnerMobile(String broPartnerMobile) {
+        this.broPartnerMobile = broPartnerMobile;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 
     public String getDocId() {

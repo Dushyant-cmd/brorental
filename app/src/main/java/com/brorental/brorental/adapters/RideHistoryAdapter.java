@@ -65,11 +65,11 @@ public class RideHistoryAdapter extends ListAdapter<RideHistoryModel, RideHistor
         holder.binding.tvDis.setText(data.getDistance() + " KM");
         holder.binding.tvFrom.setText(data.getFrom());
         holder.binding.tvTo.setText(data.getTo());
-        holder.binding.pin.setText(data.getDocId().substring(0, 4));
+        holder.binding.pin.setText(data.getPin().substring(0, 4));
         Glide.with(ctx).load(data.getProfileUrl()).placeholder(com.brorental.brorental.R.drawable.default_profile).into(holder.binding.civProfile);
 
         holder.binding.tvDial.setOnClickListener(view -> {
-            rideStatusListener.contactListener("phone");
+            rideStatusListener.contactListener(data.getBroPartnerMobile());
         });
     }
 

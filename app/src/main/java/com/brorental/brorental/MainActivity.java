@@ -256,10 +256,16 @@ public class MainActivity extends AppCompatActivity {
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
         Query query = mFirestore.collection("rent")
-                .orderBy("timestamp", Query.Direction.DESCENDING);
+                .whereEqualTo("status", "approved")
+                .whereEqualTo("liveStatus", true)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(10);
+
         if (!selectedState.isEmpty()) {
             query = mFirestore.collection("rent").whereEqualTo("state", selectedState)
                     .whereEqualTo("category", category)
+                    .whereEqualTo("status", "approved")
+                    .whereEqualTo("liveStatus", true)
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .limit(10);
         }
@@ -386,7 +392,10 @@ public class MainActivity extends AppCompatActivity {
                         appClass.sharedPref.setDLPath(d.getString("drivingLicImgPath"));
                         appClass.sharedPref.setProfilePath(d.getString("profileImgPath"));
                         appClass.sharedPref.setStatus(d.getString("status"));
-                        onActivityResult(101, RESULT_OK, null);
+
+                        headerWalletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
+                        headerNameTV.setText(appClass.sharedPref.getUser().getName());
+                        Glide.with(MainActivity.this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.default_profile).into(headerImageView);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

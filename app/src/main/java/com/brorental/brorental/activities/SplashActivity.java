@@ -21,8 +21,10 @@ import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.databinding.ActivitySplashBinding;
 import com.brorental.brorental.utilities.Utility;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.Locale;
@@ -58,6 +60,8 @@ public class SplashActivity extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
+
+                getBasicData();
             }
         }, 2000);
     }
@@ -89,6 +93,27 @@ public class SplashActivity extends AppCompatActivity {
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);
                         finish();
+                    }
+                });
+    }
+
+    private void getBasicData() {
+        appClass.firestore.collection("appData")
+                .document("constants")
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot d = task.getResult();
+                            long rentCom = d.getLong("partnerRentCommission");
+                            long rideCom = d.getLong("partnerRideCommission");
+                            String conNum = d.getString("customerCareNum");
+                            appClass.sharedPref.setPartnerRentCom(rentCom);
+                            appClass.sharedPref.setPartnerRideCom(rideCom);
+                            appClass.sharedPref.setCustomerCareNum(conNum);
+                        } else {
+                            Log.d(TAG, "onComplete: " + task.getException());
+                        }
                     }
                 });
     }

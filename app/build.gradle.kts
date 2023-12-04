@@ -52,9 +52,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-auth")
+    //play integrity
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
     //pinview
     implementation("io.github.chaosleung:pinview:1.4.4")
-    
+
     //Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
