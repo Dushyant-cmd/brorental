@@ -1,8 +1,6 @@
 package com.brorental.brorental.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -166,18 +164,6 @@ public class RideActivity extends AppCompatActivity {
                 DialogCustoms.showSnackBar(RideActivity.this, "Please change pickup and destination.", binding.getRoot());
             }
         });
-//        binding.findRideBtn.setOnClickListener(v -> {
-//            RideSheet sheet = new RideSheet(appClass, fromArr, toArr, new UtilsInterface.RideInterface() {
-//                @Override
-//                public void refresh(HashMap<String, Object> map) {
-//                    Intent i = new Intent(RideActivity.this, HistoryActivity.class);
-//                    startActivity(i);
-//                }
-//            });
-//
-//            sheet.setCancelable(false);
-//            sheet.show(getSupportFragmentManager(), "add_ride");
-//        });
     }
 
 
@@ -215,15 +201,30 @@ public class RideActivity extends AppCompatActivity {
     }
 
     private void checkAndAddRide() {
-        appClass.firestore.collection("ids").document("appid").get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            DocumentSnapshot d = task.getResult();
-                            long rideId = d.getLong("rideId") + 1;
-                            updateRideId(rideId);
-                            addRide(rideId);
+                            long totalRides = Long.parseLong(task.getResult().getString("totalRides"));
+                            if (totalRides <= 3) {
+                                appClass.firestore.collection("ids").document("appid").get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot d = task.getResult();
+                                                    long rideId = d.getLong("rideId") + 1;
+                                                    updateRideId(rideId, totalRides);
+                                                    addRide(rideId);
+                                                } else {
+                                                    Log.d(TAG, "onComplete: " + task.getException());
+                                                }
+                                            }
+                                        });
+                            } else {
+                                DialogCustoms.showSnackBar(RideActivity.this, "Complete previous 3 rides", binding.getRoot());
+                            }
                         } else {
                             Log.d(TAG, "onComplete: " + task.getException());
                         }
@@ -270,7 +271,7 @@ public class RideActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateRideId(long rideId) {
+    private void updateRideId(long rideId, long totalRides) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("rideId", rideId);
         appClass.firestore.collection("ids").document("appid")
@@ -278,6 +279,23 @@ public class RideActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Log.d(TAG, "onSuccess: " + "success");
+                    }
+                });
+
+        totalRides += 1;
+        HashMap<String, Object> map2 = new HashMap<>();
+        map2.put("totalRides", String.valueOf(totalRides));
+        long finalTotalRides = totalRides;
+        appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
+                .update(map2).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            appClass.sharedPref.setTotalRides(String.valueOf(finalTotalRides));
+                            Log.d(TAG, "onComplete: success");
+                        } else {
+                            Log.d(TAG, "onComplete: err:" + task.getException());
+                        }
                     }
                 });
     }

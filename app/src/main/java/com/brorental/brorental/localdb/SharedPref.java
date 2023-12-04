@@ -174,6 +174,9 @@ public class SharedPref {
         sharedPreferences.edit().putString("totalRentItem", totalRentItem).apply();
     }
 
+    public void setTotalRides(String totalRides) {
+        sharedPreferences.edit().putString("totalRides", totalRides).apply();
+    }
     public void logout() {
         sharedPreferences.edit().clear().apply();
         sharedPreferences.edit().putBoolean("isFirstTime", true).apply();
