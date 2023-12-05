@@ -48,6 +48,7 @@ public class PaymentAdapter extends ListAdapter<PaymentHistoryModel, PaymentAdap
         holder.binding.TAmount.setText(data.amount);
         holder.binding.TDate.setText(data.date);
         holder.binding.TRemark.setText(data.type);
+        holder.binding.tvStatus.setText("Status: " + data.status);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
