@@ -201,13 +201,13 @@ public class RideActivity extends AppCompatActivity {
     }
 
     private void checkAndAddRide() {
-        appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             long totalRides = Long.parseLong(task.getResult().getString("totalRides"));
-                            if (totalRides <= 3) {
+                            if (totalRides < 3) {
                                 appClass.firestore.collection("ids").document("appid").get()
                                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
@@ -223,6 +223,8 @@ public class RideActivity extends AppCompatActivity {
                                             }
                                         });
                             } else {
+                                binding.rideLL.setVisibility(View.VISIBLE);
+                                binding.progressLottie.setVisibility(View.GONE);
                                 DialogCustoms.showSnackBar(RideActivity.this, "Complete previous 3 rides", binding.getRoot());
                             }
                         } else {
@@ -286,7 +288,7 @@ public class RideActivity extends AppCompatActivity {
         HashMap<String, Object> map2 = new HashMap<>();
         map2.put("totalRides", String.valueOf(totalRides));
         long finalTotalRides = totalRides;
-        appClass.firestore.collection("partners").document(appClass.sharedPref.getUser().getPin())
+        appClass.firestore.collection("users").document(appClass.sharedPref.getUser().getPin())
                 .update(map2).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

@@ -47,8 +47,7 @@ public class RentHistoryFragment extends Fragment {
     private DocumentSnapshot lastDoc;
     private AlertDialog pDialog;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_rent_history, container, false);
         appClass = (AppClass) requireActivity().getApplication();

@@ -171,6 +171,7 @@ public class OtpActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.d(TAG, "onCreate: " + e);
                 sharedPreferences.logout();
+                Intent i2 = new Intent(this, SignUpAndLogin.class);
             }
         });
     }
