@@ -10,7 +10,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
         tools:context=".activities.ScreenSliderActivity">
 
 
@@ -22,6 +21,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
+            android:visibility="gone"
             app:dotsColor="#D0CCCC"
             app:dotsCornerRadius="8dp"
             app:dotsSize="16dp"
@@ -30,11 +30,25 @@
             app:progressMode="true"
             app:selectedDotColor="@color/primary" />
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewPager"
+        <ImageView
+            android:id="@+id/img"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="?android:attr/actionBarSize" />
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:contentDescription="@null"
+            android:src="@drawable/slider_2"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!--        <androidx.viewpager.widget.ViewPager-->
+        <!--            android:id="@+id/viewPager"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent" />-->
+
+        <com.denzcoskun.imageslider.ImageSlider
+            android:id="@+id/imageSlider"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <Button
             android:id="@+id/nxtBtn"
@@ -42,21 +56,29 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:text="Next" />
+            android:layout_marginEnd="@dimen/_8dp"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:text="Next"
+            android:visibility="gone" />
 
         <Button
-            android:visibility="gone"
             android:id="@+id/prevBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:text="Prev" />
+            android:layout_marginStart="@dimen/_8dp"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:text="Prev"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <Button
             android:id="@+id/skipBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/_8dp"
+            android:layout_marginEnd="@dimen/_8dp"
             android:text="Skip" />
     </RelativeLayout>
 </layout>
