@@ -1,18 +1,17 @@
 package com.brorental.brorental.adapters;
 
-import static android.os.Build.VERSION_CODES.R;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-import com.brorental.brorental.R;
+
 import com.brorental.brorental.databinding.RideHistoryListItemBinding;
 import com.brorental.brorental.interfaces.UtilsInterface;
 import com.brorental.brorental.models.RideHistoryModel;
@@ -28,6 +27,7 @@ public class RideHistoryAdapter extends ListAdapter<RideHistoryModel, RideHistor
     private Context ctx;
     private UtilsInterface.RideHistoryListener rideStatusListener;
     private AppClass appClass;
+
     public RideHistoryAdapter(Context ctx, AppClass appClass) {
         super(new DiffUtil.ItemCallback<RideHistoryModel>() {
             @Override
@@ -43,6 +43,7 @@ public class RideHistoryAdapter extends ListAdapter<RideHistoryModel, RideHistor
         this.appClass = appClass;
         this.ctx = ctx;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -69,12 +70,27 @@ public class RideHistoryAdapter extends ListAdapter<RideHistoryModel, RideHistor
         Glide.with(ctx).load(data.getProfileUrl()).placeholder(com.brorental.brorental.R.drawable.default_profile).into(holder.binding.civProfile);
 
         holder.binding.tvDial.setOnClickListener(view -> {
-            rideStatusListener.contactListener(data.getBroPartnerMobile());
+            if (data.getStatus().equalsIgnoreCase("pending")) {
+                Toast.makeText(ctx, "Calling customer care...", Toast.LENGTH_SHORT).show();
+                rideStatusListener.contactListener(appClass.sharedPref.getCustomerCareNum());
+            } else {
+                Toast.makeText(ctx, "Calling " + data.getName() + "...", Toast.LENGTH_SHORT).show();
+                rideStatusListener.contactListener(data.getBroPartnerMobile());
+            }
         });
+
+        if (data.getStatus().equalsIgnoreCase("pending")) {
+            holder.binding.tvName.setVisibility(View.GONE);
+            holder.binding.civProfile.setVisibility(View.GONE);
+        } else {
+            holder.binding.tvName.setVisibility(View.VISIBLE);
+            holder.binding.civProfile.setVisibility(View.VISIBLE);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public RideHistoryListItemBinding binding;
+
         public ViewHolder(RideHistoryListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
@@ -15,19 +20,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.brorental.brorental.MainActivity;
 import com.brorental.brorental.R;
 import com.brorental.brorental.adapters.RideHistoryAdapter;
 import com.brorental.brorental.databinding.FragmentRideHistoryBinding;
 import com.brorental.brorental.interfaces.UtilsInterface;
-import com.brorental.brorental.models.HistoryModel;
-import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.models.RideHistoryModel;
 import com.brorental.brorental.utilities.AppClass;
 import com.brorental.brorental.utilities.DialogCustoms;
@@ -53,6 +49,7 @@ public class RideHistoryFragment extends Fragment {
     private DocumentSnapshot lastDoc;
     private long page = 0;
     private AlertDialog pDialog;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -103,15 +100,16 @@ public class RideHistoryFragment extends Fragment {
                         binding.swipeRef.setRefreshing(false);
                         binding.shimmer.setVisibility(View.GONE);
                         binding.recyclerView.setVisibility(View.VISIBLE);
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             list.clear();
                             List<DocumentSnapshot> dList = task.getResult().getDocuments();
-                            for(DocumentSnapshot d: dList) {
+                            for (DocumentSnapshot d : dList) {
                                 RideHistoryModel model = d.toObject(RideHistoryModel.class);
                                 list.add(model);
                             }
                             Log.d(TAG, "onComplete: " + list);
                             adapter.submitList(list);
+                            adapter.notifyDataSetChanged();
 
                             adapter.addRefreshListeners(new UtilsInterface.RideHistoryListener() {
                                 @Override
@@ -121,15 +119,13 @@ public class RideHistoryFragment extends Fragment {
 
                                 @Override
                                 public void contactListener(String type) {
-//                                    if(type.equalsIgnoreCase("phone")) {
-                                        Intent i = new Intent(Intent.ACTION_DIAL);
-                                        i.setData(Uri.parse("tel:" + appClass.sharedPref.getCustomerCareNum()));
-                                        activity.startActivity(i);
-//                                    }
+                                    Intent i = new Intent(Intent.ACTION_DIAL);
+                                    i.setData(Uri.parse("tel:" + appClass.sharedPref.getCustomerCareNum()));
+                                    activity.startActivity(i);
                                 }
                             });
 
-                            if(!dList.isEmpty())
+                            if (!dList.isEmpty())
                                 lastDoc = dList.get(dList.size() - 1);
 
                             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
@@ -141,8 +137,8 @@ public class RideHistoryFragment extends Fragment {
                                             Log.v(TAG, "list scroll till bottom");
                                             if (Utility.isNetworkAvailable(requireContext()) && page == 0) {
                                                 page++;
-                                                loadMoreGameResult();
-                                            } else if(!Utility.isNetworkAvailable(requireContext())) {
+                                                loadMoreRideResult();
+                                            } else if (!Utility.isNetworkAvailable(requireContext())) {
                                                 Toast.makeText(getActivity(), "Check internet connection", Toast.LENGTH_SHORT).show();
                                             }
                                         }
@@ -155,7 +151,7 @@ public class RideHistoryFragment extends Fragment {
                 });
     }
 
-    private void loadMoreGameResult() {
+    private void loadMoreRideResult() {
         pDialog.show();
         appClass.firestore.collection("rideHistory").whereEqualTo("broRentalId", appClass.sharedPref.getUser().getPin())
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -166,15 +162,15 @@ public class RideHistoryFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         page = 0;
                         pDialog.dismiss();
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             List<DocumentSnapshot> dList = task.getResult().getDocuments();
-                            if(!dList.isEmpty()) {
-                                for(DocumentSnapshot d: dList) {
+                            if (!dList.isEmpty()) {
+                                for (DocumentSnapshot d : dList) {
                                     RideHistoryModel model = d.toObject(RideHistoryModel.class);
                                     list.add(model);
                                 }
 
-                                if(!dList.isEmpty())
+                                if (!dList.isEmpty())
                                     lastDoc = dList.get(dList.size() - 1);
 
                                 adapter.submitList(list);

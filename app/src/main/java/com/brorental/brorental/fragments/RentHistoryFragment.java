@@ -88,6 +88,7 @@ public class RentHistoryFragment extends Fragment {
                             }
                             Log.d(TAG, "onComplete: " + list);
                             adapter.submitList(list);
+                            adapter.notifyDataSetChanged();
 
                             if(!dList.isEmpty())
                                 lastDoc = dList.get(dList.size() - 1);

@@ -3,11 +3,11 @@ package com.brorental.brorental.models;
 import java.util.Objects;
 
 public class RideHistoryModel {
-    private String from, to, broPartnerId, broRentalId, paymentMode, status, profileUrl, name, docId, pin, broPartnerMobile;
+    private String from, to, broPartnerId, broRentalId, paymentMode, status, profileUrl, name, docId, pin, broPartnerNumber;
     private long amount, distance, startTimestamp, endTimestamp, timestamp, rideId;
 
 
-    public RideHistoryModel(String from, String to, String broPartnerId, String broRentalId, String paymentMode, String status, String profileUrl, String name, long amount, long distance, long startTimestamp, long endTimestamp, long timestamp, long rideId, String docId, String pin, String broPartnerMobile) {
+    public RideHistoryModel(String from, String to, String broPartnerId, String broRentalId, String paymentMode, String status, String profileUrl, String name, long amount, long distance, long startTimestamp, long endTimestamp, long timestamp, long rideId, String docId, String pin, String broPartnerNumber) {
         this.from = from;
         this.to = to;
         this.broPartnerId = broPartnerId;
@@ -24,28 +24,28 @@ public class RideHistoryModel {
         this.rideId = rideId;
         this.docId = docId;
         this.pin = pin;
-        this.broPartnerMobile = broPartnerMobile;
+        this.broPartnerNumber = broPartnerNumber;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RideHistoryModel)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         RideHistoryModel that = (RideHistoryModel) o;
-        return getAmount() == that.getAmount() && getDistance() == that.getDistance() && getStartTimestamp() == that.getStartTimestamp() && getEndTimestamp() == that.getEndTimestamp() && getTimestamp() == that.getTimestamp() && getRideId() == that.getRideId() && Objects.equals(getFrom(), that.getFrom()) && Objects.equals(getTo(), that.getTo()) && Objects.equals(getBroPartnerId(), that.getBroPartnerId()) && Objects.equals(getBroRentalId(), that.getBroRentalId()) && Objects.equals(getPaymentMode(), that.getPaymentMode()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getProfileUrl(), that.getProfileUrl()) && Objects.equals(getName(), that.getName()) && Objects.equals(getDocId(), that.getDocId()) && Objects.equals(getPin(), that.getPin()) && Objects.equals(getBroPartnerMobile(), that.getBroPartnerMobile());
+        return amount == that.amount && distance == that.distance && startTimestamp == that.startTimestamp && endTimestamp == that.endTimestamp && timestamp == that.timestamp && rideId == that.rideId && Objects.equals(from, that.from) && Objects.equals(to, that.to) && Objects.equals(broPartnerId, that.broPartnerId) && Objects.equals(broRentalId, that.broRentalId) && Objects.equals(paymentMode, that.paymentMode) && Objects.equals(status, that.status) && Objects.equals(profileUrl, that.profileUrl) && Objects.equals(name, that.name) && Objects.equals(docId, that.docId) && Objects.equals(pin, that.pin) && Objects.equals(broPartnerNumber, that.broPartnerNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFrom(), getTo(), getBroPartnerId(), getBroRentalId(), getPaymentMode(), getStatus(), getProfileUrl(), getName(), getDocId(), getPin(), getBroPartnerMobile(), getAmount(), getDistance(), getStartTimestamp(), getEndTimestamp(), getTimestamp(), getRideId());
+        return Objects.hash(from, to, broPartnerId, broRentalId, paymentMode, status, profileUrl, name, docId, pin, broPartnerNumber, amount, distance, startTimestamp, endTimestamp, timestamp, rideId);
     }
 
     public String getBroPartnerMobile() {
-        return broPartnerMobile;
+        return broPartnerNumber;
     }
 
     public void setBroPartnerMobile(String broPartnerMobile) {
-        this.broPartnerMobile = broPartnerMobile;
+        this.broPartnerNumber = broPartnerMobile;
     }
 
     public String getPin() {

@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerView.setAdapter(adapter);
         adapter.submitList(list);
+        adapter.notifyDataSetChanged();
     }
 
     private void getData() {
