@@ -74,7 +74,7 @@ public class RideHistoryAdapter extends ListAdapter<RideHistoryModel, RideHistor
                 Toast.makeText(ctx, "Calling customer care...", Toast.LENGTH_SHORT).show();
                 rideStatusListener.contactListener(appClass.sharedPref.getCustomerCareNum());
             } else {
-                Toast.makeText(ctx, "Calling " + data.getName() + "...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Calling customer...", Toast.LENGTH_SHORT).show();
                 rideStatusListener.contactListener(data.getBroPartnerMobile());
             }
         });

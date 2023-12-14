@@ -3,6 +3,7 @@ package com.brorental.brorental;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +37,6 @@ import com.brorental.brorental.activities.RideActivity;
 import com.brorental.brorental.adapters.RentListAdapter;
 import com.brorental.brorental.databinding.ActivityMainBinding;
 import com.brorental.brorental.fragments.SearchFragment;
-import com.brorental.brorental.models.HistoryModel;
 import com.brorental.brorental.models.RentItemModel;
 import com.brorental.brorental.models.User;
 import com.brorental.brorental.utilities.AppClass;
@@ -237,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
                     Intent i = new Intent(MainActivity.this, HistoryActivity.class);
                     startActivity(i);
                 } else if (id == R.id.termsCon) {
-                    DialogCustoms.showSnackBar(MainActivity.this, "Terms & Conditions", binding.getRoot());
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://brorental.com/terms"));
+                    startActivity(i);
                 }
 
                 return true;
@@ -288,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
                             adapter.notifyDataSetChanged();
 
-                            if(!docList.isEmpty())
+                            if (!docList.isEmpty())
                                 lastDoc = docList.get(docList.size() - 1);
 
                             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
@@ -301,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                                             if (Utility.isNetworkAvailable(MainActivity.this) && page == 0) {
                                                 page++;
                                                 loadMoreGameResult();
-                                            } else if(!Utility.isNetworkAvailable(MainActivity.this)) {
+                                            } else if (!Utility.isNetworkAvailable(MainActivity.this)) {
                                                 Toast.makeText(MainActivity.this, "Check internet connection", Toast.LENGTH_SHORT).show();
                                             }
                                         }
@@ -325,15 +326,15 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 page = 0;
                 pDialog.dismiss();
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     List<DocumentSnapshot> dList = task.getResult().getDocuments();
-                    if(!dList.isEmpty()) {
-                        for(DocumentSnapshot d: dList) {
+                    if (!dList.isEmpty()) {
+                        for (DocumentSnapshot d : dList) {
                             RentItemModel model = d.toObject(RentItemModel.class);
                             list.add(model);
                         }
 
-                        if(!dList.isEmpty())
+                        if (!dList.isEmpty())
                             lastDoc = dList.get(dList.size() - 1);
 
                         adapter.submitList(list);
