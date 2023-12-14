@@ -120,7 +120,7 @@ public class RideHistoryFragment extends Fragment {
                                 @Override
                                 public void contactListener(String type) {
                                     Intent i = new Intent(Intent.ACTION_DIAL);
-                                    i.setData(Uri.parse("tel:" + appClass.sharedPref.getCustomerCareNum()));
+                                    i.setData(Uri.parse("tel:" + type));
                                     activity.startActivity(i);
                                 }
                             });

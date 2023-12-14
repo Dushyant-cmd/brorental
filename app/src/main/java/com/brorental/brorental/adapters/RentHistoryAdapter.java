@@ -18,6 +18,7 @@ import com.brorental.brorental.databinding.PaymentHistoryListItemBinding;
 import com.brorental.brorental.databinding.RentHistoryListItemBinding;
 import com.brorental.brorental.models.HistoryModel;
 import com.brorental.brorental.models.PaymentHistoryModel;
+import com.brorental.brorental.utilities.Utility;
 import com.bumptech.glide.Glide;
 
 public class RentHistoryAdapter extends ListAdapter<HistoryModel, RentHistoryAdapter.ViewHolder> {
@@ -53,7 +54,7 @@ public class RentHistoryAdapter extends ListAdapter<HistoryModel, RentHistoryAda
         holder.binding.perHourTV.setText("Total Cost: \u20B9 " + data.totalRentCost);
         holder.binding.pin.setText("Pin: " + data.id.substring(0, 4) + " share it with BroPartner");
         holder.binding.timingsTV.setText("From: " + data.rentStartTime + " To: " + data.rentEndTime);
-        holder.binding.extraHourCh.setText("\u20B9 Extra charge per hour");
+        holder.binding.extraHourCh.setText(Utility.rupeeIcon + data.extraCharge + " Extra charge per hour");
         holder.binding.payStatus.setText("Payment Completed " + data.paymentMode);
         holder.binding.advertId.setText("Advertisement Id: " + data.advertisementId);
         holder.binding.statusTV.setText("Status: " + data.status);
