@@ -70,7 +70,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.brorental.brorental.provider"
+            android:authorities="com.brorental.bro_rental.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

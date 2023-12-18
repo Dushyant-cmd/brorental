@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.brorental.brorental"
+    namespace = "com.brorental.bro_rental"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.brorental.brorental"
+        applicationId = "com.brorental.bro_rental"
         minSdk = 21
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
