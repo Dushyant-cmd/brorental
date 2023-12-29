@@ -20,7 +20,7 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
     private String TAG = "HintAdapter.java";
     private ArrayList<String> list;
     private MainActivity hostAct;
-    public UtilsInterface.RefreshInterface refreshInterface;
+    public UtilsInterface.SearchInterface refreshInterface;
 
     public HintAdapter(Context ctx, ArrayList<String> list) {
         hostAct = (MainActivity) ctx;
@@ -41,7 +41,7 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
         holder.hintTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                refreshInterface.refresh(position);
+                refreshInterface.refresh(str);
             }
         });
     }
@@ -59,7 +59,7 @@ public class HintAdapter extends RecyclerView.Adapter<HintAdapter.ViewHolder> {
         }
     }
 
-    public void addRefreshListener(UtilsInterface.RefreshInterface refreshInterface) {
+    public void addRefreshListener(UtilsInterface.SearchInterface refreshInterface) {
         this.refreshInterface = refreshInterface;
     }
 }

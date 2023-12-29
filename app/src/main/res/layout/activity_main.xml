@@ -78,9 +78,9 @@
                 android:layout_height="wrap_content">
 
                 <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_sv"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/nested_sv">
+                    android:layout_height="match_parent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -89,6 +89,7 @@
 
                         <com.facebook.shimmer.ShimmerFrameLayout
                             android:id="@+id/shimmer"
+                            tools:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="#fff"
@@ -99,6 +100,36 @@
                             <include layout="@layout/placeholder_layout" />
 
                         </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        <LinearLayout
+                            android:id="@+id/no_data"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/_8dp"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible" >
+
+                            <FrameLayout
+                                android:layout_gravity="center_horizontal"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/no_data"
+                                    tools:visibility="visible" />
+                            </FrameLayout>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:gravity="center"
+                                android:text="No Rents Found!\nPlease try again later."
+                                android:theme="@style/textStyle" />
+                        </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerView"

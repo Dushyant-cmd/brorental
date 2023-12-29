@@ -13,6 +13,11 @@ public interface UtilsInterface {
         void refresh(int catePosition);
     }
 
+    interface SearchInterface {
+
+        void refresh(String query);
+    }
+
     interface RideInterface {
         void refresh(HashMap<String, Object> map);
     }

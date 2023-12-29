@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -100,11 +101,10 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 int catePosition = Arrays.asList(cateArr).indexOf(query.trim());
-                Log.d(TAG, "onQueryTextSubmit: " + catePosition);
                 if (catePosition < 0) {
                     DialogCustoms.showSnackBar(getActivity(), "Select Valid Category", binding.getRoot());
                 } else
-                    adapter.refreshInterface.refresh(catePosition);
+                    adapter.refreshInterface.refresh(query);
                 return false;
             }
 
@@ -126,15 +126,15 @@ public class SearchFragment extends Fragment {
                 return false;
             }
         });
-        adapter.addRefreshListener(new UtilsInterface.RefreshInterface() {
+        adapter.addRefreshListener(new UtilsInterface.SearchInterface() {
             /**Below method will refresh list on MainActivity */
             @Override
-            public void refresh(int catePosition) {
+            public void refresh(String query) {
                 if (!stateList.isEmpty()) {
                     try {
                         MainActivity hostAct = (MainActivity) requireActivity();
                         if (!hostAct.isFinishing())
-                            hostAct.queries(binding.spinner.getSelectedItem().toString().toLowerCase(), hintList.get(catePosition).toLowerCase());
+                            hostAct.queries(binding.spinner.getSelectedItem().toString(), query.toLowerCase());
                         appClass.sharedPref.setState((String) binding.spinner.getSelectedItem());
                         Utility.hideKeyboardFrom(getActivity(), getContext(), binding.getRoot(), true);
                         hostAct.getSupportFragmentManager().popBackStackImmediate();
@@ -252,7 +252,7 @@ public class SearchFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult().exists()) {
                             DocumentSnapshot d = task.getResult();
-                            String str = d.getString("categories").toLowerCase();
+                            String str = Objects.requireNonNull(d.getString("categories")).toLowerCase();
                             cateArr = str.split(",");
                         } else {
                             Log.d(TAG, "onComplete: " + task.getException());

@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         headerNameTV = headerView.findViewById(R.id.nameTV);
         headerWalletLL = headerView.findViewById(R.id.walletLL);
         Log.d(TAG, "onCreate: " + appClass.sharedPref.getUser().getTotalRent() + "\n" + appClass.sharedPref.getUser().getWallet());
-        headerWalletTV.setText("\u20B9 " + Utility.getTotalWallet(appClass));
+        headerWalletTV.setText(Utility.rupeeIcon + Utility.getTotalWallet(appClass));
         headerNameTV.setText(appClass.sharedPref.getUser().getName());
 
         Glide.with(this).load(appClass.sharedPref.getUser().getProfileUrl()).placeholder(R.drawable.profile_24).into(headerImageView);
@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d(TAG, "getData: " + selectedState + "," + category);
         binding.shimmer.setVisibility(View.VISIBLE);
         binding.recyclerView.setVisibility(View.GONE);
+        binding.noData.setVisibility(View.GONE);
         Query query = mFirestore.collection("rent")
                 .whereEqualTo("status", "approved")
                 .whereEqualTo("liveStatus", true)
@@ -289,8 +290,12 @@ public class MainActivity extends AppCompatActivity {
 
                             adapter.notifyDataSetChanged();
 
-                            if (!docList.isEmpty())
+                            if (!docList.isEmpty()) {
                                 lastDoc = docList.get(docList.size() - 1);
+                            } else {
+                                binding.recyclerView.setVisibility(View.GONE);
+                                binding.noData.setVisibility(View.VISIBLE);
+                            }
 
                             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
                                 binding.nestedSv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
@@ -310,6 +315,8 @@ public class MainActivity extends AppCompatActivity {
                                 });
                             Log.d(TAG, "onComplete: " + docList.size());
                         } else {
+                            binding.recyclerView.setVisibility(View.GONE);
+                            binding.noData.setVisibility(View.VISIBLE);
                             Log.d(TAG, "onComplete: " + task.getException());
                         }
                     }
