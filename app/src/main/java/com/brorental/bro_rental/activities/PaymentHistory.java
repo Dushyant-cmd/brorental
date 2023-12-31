@@ -90,6 +90,7 @@ public class PaymentHistory extends AppCompatActivity {
             Button cancelBtn = view.findViewById(R.id.cancelRec);
             EditText rechargeET = view.findViewById(R.id.rechargeAmt);
             submitBtn.setOnClickListener(v -> {
+                pDialog.show();
                 if (!rechargeET.getText().toString().isEmpty()) {
                     long amt = Long.parseLong(rechargeET.getText().toString());
                     wal = Long.parseLong(appClass.sharedPref.getUser().getWallet());
